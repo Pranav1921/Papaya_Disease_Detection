@@ -1,0 +1,8 @@
+{
+  "venvPath": "papaya_disease_system",
+  "venv": ".venv",
+  "extraPaths": [
+    "papaya_disease_system/src",
+    "papaya_disease_system"
+  ]
+}

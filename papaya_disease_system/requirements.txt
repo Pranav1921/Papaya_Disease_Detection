@@ -1,0 +1,12 @@
+tensorflow
+numpy>=1.23.0
+opencv-python>=4.6.0
+Pillow>=9.2.0
+matplotlib>=3.5.0
+scikit-learn>=1.1.0
+streamlit>=1.20.0
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+kagglehub

@@ -1,0 +1,41 @@
+# Virtual Environments
+.venv/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+**/android/.gradle/
+**/android/.gradle_home/
+**/android/app/build/
+**/android/local.properties
+
+# Android
+.gradle/
+local.properties
+*.keystore
+*.jks
+*.apk
+*.aab
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Project specific rejections
+.artifacts/
+papaya_disease_system/data/raw/
+papaya_disease_system/data/processed/
