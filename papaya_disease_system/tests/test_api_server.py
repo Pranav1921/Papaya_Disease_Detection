@@ -209,23 +209,32 @@ def test_news_endpoint_returns_all_five_news_entries(api_client):
 
 
 @pytest.mark.parametrize(
-    ("disease_key", "severity_range", "statuses"),
+    ("disease_key", "severity_range"),
     [
-        ("powdery_mildew", (72.4, 80.4), {"Moderate", "Severe"}),
-        ("ringspot_virus", (84.5, 92.5), {"Critical"}),
-        ("leaf_curl", (61.0, 69.0), {"Severe"}),
-        ("healthy", (0.0, 0.0), {"Healthy"}),
+        ("powdery_mildew", (72.4, 80.4)),
+        ("ringspot_virus", (84.5, 92.5)),
+        ("leaf_curl", (61.0, 69.0)),
+        ("healthy", (0.0, 0.0)),
     ],
 )
 def test_predict_endpoint_disease_mappings(
-    api_client, disease_key, severity_range, statuses
+    api_client, disease_key, severity_range
 ):
     response = api_client.post("/api/v1/predict", data={"disease_key": disease_key})
     assert response.status_code == 200
     payload = response.json()
     assert payload["disease_key"] == disease_key
     assert severity_range[0] <= payload["severity"] <= severity_range[1]
-    assert payload["status"] in statuses
+    severity = payload["severity"]
+    if severity > 80:
+        expected_status = "Critical"
+    elif severity > 50:
+        expected_status = "Severe"
+    elif severity > 10:
+        expected_status = "Moderate"
+    else:
+        expected_status = "Healthy"
+    assert payload["status"] == expected_status
 
 
 def test_predict_endpoint_rejects_background(api_client):
