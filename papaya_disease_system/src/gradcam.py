@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 from typing import Any, Optional
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def get_gradcam_overlay(model: Any, img_array: Optional[np.ndarray]) -> Optional[np.ndarray]:
@@ -18,6 +21,7 @@ def get_gradcam_overlay(model: Any, img_array: Optional[np.ndarray]) -> Optional
     try:
         import tensorflow as tf
     except ImportError:
+        logger.warning("TensorFlow unavailable; skipping Grad-CAM overlay.", exc_info=True)
         return None
 
     try:
@@ -28,6 +32,7 @@ def get_gradcam_overlay(model: Any, img_array: Optional[np.ndarray]) -> Optional
                 break
 
         if conv_layer is None:
+            logger.warning("No Conv2D layer found in the model; skipping Grad-CAM overlay.")
             return None
 
         grad_model = tf.keras.models.Model(
@@ -48,4 +53,5 @@ def get_gradcam_overlay(model: Any, img_array: Optional[np.ndarray]) -> Optional
         heatmap = heatmap.numpy()
         return np.uint8(255 * heatmap)
     except Exception:
+        logger.exception("Grad-CAM overlay generation failed; falling back to the original image.")
         return None

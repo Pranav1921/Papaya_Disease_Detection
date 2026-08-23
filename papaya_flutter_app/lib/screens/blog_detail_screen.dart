@@ -72,8 +72,16 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
   void _playTts() async {
     setState(() => _ttsState = TtsState.playing);
     final textToSpeak = widget.news.getTitle(widget.language) + ". " + _getFullBlogContent();
-    await KannadaTtsService.speakText(textToSpeak, widget.language);
-    if (mounted) setState(() => _ttsState = TtsState.stopped);
+    final bool spoken = await KannadaTtsService.speakText(textToSpeak, widget.language);
+    if (!mounted) return;
+    setState(() => _ttsState = TtsState.stopped);
+    if (!spoken) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Audio playback is unavailable on this device.'),
+        ),
+      );
+    }
   }
 
   void _pauseTts() async {

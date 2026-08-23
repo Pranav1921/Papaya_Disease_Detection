@@ -1,6 +1,10 @@
 # src/localization.py
 import io
+import logging
+
 from gtts import gTTS
+
+logger = logging.getLogger(__name__)
 
 # Interface string translations
 UI_TEXT = {
@@ -40,6 +44,6 @@ def generate_audio_guide(text_to_speak, lang="en"):
         tts.write_to_fp(audio_buffer)
         audio_buffer.seek(0)
         return audio_buffer
-    except Exception as e:
-        print(f"[WARNING] TTS generation failed: {e}")
+    except Exception:
+        logger.warning("TTS generation failed; the audio guide will be unavailable.", exc_info=True)
         return None
