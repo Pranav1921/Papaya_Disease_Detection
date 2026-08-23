@@ -1,12 +1,19 @@
 import os
 import sys
 import json
+import logging
 import math
 import random
 import warnings
 
 # Suppress Deprecation Warnings for cleaner terminal
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("papaya.api")
 
 # Attempt to import FastAPI and dependencies
 try:
@@ -15,6 +22,7 @@ try:
     import uvicorn
     HAS_FASTAPI = True
 except ImportError:
+    logger.warning("FastAPI/uvicorn unavailable; falling back to the built-in HTTP server.", exc_info=True)
     HAS_FASTAPI = False
 
 # Attempt to import TensorFlow and Image dependencies
@@ -46,27 +54,27 @@ try:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         model = tf.keras.models.load_model(MODEL_PATH)
-        print(f"Loaded papaya model successfully from {MODEL_PATH}")
+        logger.info("Loaded papaya model successfully from %s", MODEL_PATH)
     else:
-        print(f"Model path not found: {MODEL_PATH}")
+        logger.error("Model path not found: %s — disease classification will be unavailable.", MODEL_PATH)
 
     # Load general ImageNet model for AI leaf/plant detection
     try:
         imagenet_model = MobileNetV2(weights='imagenet')
         HAS_IMAGENET = True
-        print("Loaded ImageNet model for AI leaf detection.")
+        logger.info("Loaded ImageNet model for AI leaf detection.")
         # Warm up ImageNet model to cache class indices
         dummy_input = np.zeros((1, 224, 224, 3))
         dummy_pred = imagenet_model.predict(dummy_input, verbose=0)
         decode_predictions(dummy_pred, top=1)
-        print("ImageNet model warmed up (indices cached).")
-    except Exception as e:
+        logger.info("ImageNet model warmed up (indices cached).")
+    except Exception:
         HAS_IMAGENET = False
-        print(f"Could not load ImageNet model: {e}")
+        logger.exception("Could not load ImageNet model; the imposter-leaf filter is disabled.")
 
-except Exception as e:
+except Exception:
     HAS_IMAGENET = False
-    print(f"TensorFlow or PIL not available for inference, using fallback predictions. Error: {e}")
+    logger.exception("TensorFlow or PIL not available for inference; disease classification is disabled.")
 
 # Reference user location (Puttur center)
 DEFAULT_LAT = 12.7684
@@ -82,11 +90,16 @@ def calculate_haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> f
 
 def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -> str:
     """Internal helper: sends an image + text prompt to Gemini.
-    Supports both direct Gemini API and OpenRouter endpoints based on key structure."""
-    try:
-        import urllib.request
-        import base64
+    Supports both direct Gemini API and OpenRouter endpoints based on key structure.
 
+    Returns the model answer, or an empty string when the API is unreachable or
+    replies with an unexpected payload. Callers must treat "" as "check failed".
+    """
+    import base64
+    import urllib.error
+    import urllib.request
+
+    try:
         # Use the key from environment, or default to a placeholder
         api_key = os.getenv("GEMINI_API_KEY", "YOUR_OPENROUTER_KEY_HERE")
         base64_image = base64.b64encode(image_bytes).decode('utf-8')
@@ -97,7 +110,7 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
         # Diagnostics: Print API provider (but mask the key)
         provider = "OpenRouter" if is_openrouter else "Google Gemini"
         key_preview = api_key[:8] + "..." if len(api_key) > 8 else "MISSING"
-        print(f"[AI Diagnostic] Using {provider} (Key: {key_preview})")
+        logger.debug("[AI Diagnostic] Using %s (Key: %s)", provider, key_preview)
 
         if is_openrouter:
             url = "https://openrouter.ai/api/v1/chat/completions"
@@ -130,8 +143,8 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
                     result = json.loads(response.read().decode('utf-8'))
                     return result['choices'][0]['message']['content'].strip().upper()
             except urllib.error.HTTPError as e:
-                error_body = e.read().decode('utf-8')
-                print(f"[OpenRouter Error] {e.code}: {error_body}")
+                error_body = e.read().decode('utf-8', errors='replace')
+                logger.error("[OpenRouter Error] %s: %s", e.code, error_body)
                 return ""
         else:
             # Direct Google Gemini API endpoint
@@ -158,11 +171,19 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
                 }
             }
             req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
-            with urllib.request.urlopen(req, timeout=8) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                return result['candidates'][0]['content']['parts'][0]['text'].strip().upper()
-    except Exception as e:
-        print(f"Gemini vision API error: {e}")
+            try:
+                with urllib.request.urlopen(req, timeout=8) as response:
+                    result = json.loads(response.read().decode('utf-8'))
+                    return result['candidates'][0]['content']['parts'][0]['text'].strip().upper()
+            except urllib.error.HTTPError as e:
+                error_body = e.read().decode('utf-8', errors='replace')
+                logger.error("[Gemini Error] %s: %s", e.code, error_body)
+                return ""
+    except (urllib.error.URLError, OSError, TimeoutError):
+        logger.warning("Gemini vision API unreachable; shape/leaf verification will be skipped.", exc_info=True)
+        return ""
+    except (ValueError, KeyError, IndexError, TypeError):
+        logger.error("Gemini vision API returned an unexpected payload.", exc_info=True)
         return ""
 
 
@@ -192,12 +213,18 @@ def is_leaf_image_heuristic(image_bytes: bytes) -> bool:
                 green_pixels += 1
             checked_count += 1
             
+        if checked_count == 0:
+            logger.error("[Heuristic] Image contains no pixels to sample; treating as a failed check.")
+            return True
+
         green_ratio = green_pixels / checked_count
-        print(f"[Heuristic] Image green-ratio: {green_ratio * 100:.2f}%")
+        logger.info("[Heuristic] Image green-ratio: %.2f%%", green_ratio * 100)
         return green_ratio > 0.12  # Lowered from 0.20 to 0.12 to allow leaves on white/plain backgrounds
-    except Exception as e:
-        print(f"[Heuristic] Color check error: {e}")
-        return True # Default to pass if anything fails
+    except Exception:
+        # Fail open: this is the last-resort fallback, so a broken heuristic must
+        # not block a scan. Log the traceback so the failure is never invisible.
+        logger.exception("[Heuristic] Color check failed; defaulting to pass.")
+        return True
 
 def is_leaf_image_ai(image_bytes: bytes) -> bool:
     """Stage 1: Use Gemini AI to detect if the image contains any leaf or plant.
@@ -210,7 +237,7 @@ def is_leaf_image_ai(image_bytes: bytes) -> bool:
         )
     )
     if answer == "":
-        print("Stage 1 (leaf check) API unavailable. Using color heuristic fallback...")
+        logger.warning("Stage 1 (leaf check) API unavailable. Using color heuristic fallback...")
         return is_leaf_image_heuristic(image_bytes)
     return "YES" in answer
 
@@ -227,7 +254,7 @@ def is_papaya_leaf_ai(image_bytes: bytes) -> str:
         )
     )
     if answer == "":
-        print("Stage 2 (papaya check) API unavailable.")
+        logger.warning("Stage 2 (papaya check) API unavailable.")
         return "FAIL"
     return "YES" if "YES" in answer else "NO"
 
@@ -262,8 +289,8 @@ def remove_background(image_bytes: bytes) -> bytes:
         img_byte_arr = io.BytesIO()
         white_bg.save(img_byte_arr, format='JPEG')
         return img_byte_arr.getvalue()
-    except Exception as e:
-        print(f"[BG Removal Skip] Skipping background removal: {e}")
+    except Exception:
+        logger.warning("[BG Removal Skip] Skipping background removal.", exc_info=True)
         return image_bytes # Fallback to original
 
 def predict_image(image_bytes: bytes, force: bool = False):
@@ -279,25 +306,25 @@ def predict_image(image_bytes: bytes, force: bool = False):
         import numpy as np
 
         # === STAGE 0: Background Removal ===
-        print("[Stage 0] Removing background for focus...")
+        logger.info("[Stage 0] Removing background for focus...")
         clean_image_bytes = remove_background(image_bytes)
 
         # === STAGE 1: AI Leaf Detection (Gemini) ===
-        print("[Stage 1] Checking if image contains a leaf...")
+        logger.info("[Stage 1] Checking if image contains a leaf...")
         # Use clean image for detection
         leaf_present = is_leaf_image_ai(clean_image_bytes)
         if not leaf_present:
-            print("[Stage 1] REJECTED — no leaf detected.")
+            logger.info("[Stage 1] REJECTED — no leaf detected.")
             return "__not_a_leaf__", 0.0
-        print("[Stage 1] PASSED — leaf detected.")
+        logger.info("[Stage 1] PASSED — leaf detected.")
 
         # === STAGE 2: AI Papaya Leaf Verification (Gemini) ===
-        print("[Stage 2] Checking if leaf is specifically a papaya leaf...")
+        logger.info("[Stage 2] Checking if leaf is specifically a papaya leaf...")
         papaya_status = is_papaya_leaf_ai(clean_image_bytes)
 
         # === STAGE 3: Disease Classification (TF Model) ===
         if not HAS_TF or model is None:
-            print("[Stage 3] TF model not loaded, cannot classify disease.")
+            logger.error("[Stage 3] TF model not loaded, cannot classify disease.")
             return None
 
         # Process clean image for model
@@ -313,7 +340,7 @@ def predict_image(image_bytes: bytes, force: bool = False):
              imagenet_preds = imagenet_model.predict(img_imagenet, verbose=0)
              decoded = decode_predictions(imagenet_preds, top=5)[0]
 
-             print(f"[ImageNet Diagnostics] Top 3: {[(d[1], round(d[2], 3)) for d in decoded[:3]]}")
+             logger.info("[ImageNet Diagnostics] Top 3: %s", [(d[1], round(d[2], 3)) for d in decoded[:3]])
 
              # 1. Reject obvious non-plant items
              plant_keywords = ['leaf', 'plant', 'tree', 'veggie', 'fruit', 'grass', 'flora', 'herb', 'corn', 'buckeye', 'cardoon', 'head_cabbage', 'bell_pepper', 'cucumber', 'zucchini']
@@ -326,20 +353,15 @@ def predict_image(image_bytes: bytes, force: bool = False):
                  # Check for whole words or specific substrings to avoid "corn" in "acorn"
                  clean_label = label.lower().replace("_", " ")
                  if any(imp in clean_label for imp in imposters) and score > 0.22:
-                     print(f"[REJECTION] ImageNet detected imposter {label} with {score*100:.2f}% confidence.")
+                     logger.info("[REJECTION] ImageNet detected imposter %s with %.2f%% confidence.", label, score * 100)
                      return "__not_papaya__", 0.0
 
              if not is_actually_a_plant:
                  top_label = decoded[0][1]
                  # If top result is something like 'shoe', 'keyboard', 'web_site', 'analog_clock'
                  if decoded[0][2] > 0.25:
-                     print(f"[REJECTION] ImageNet detected '{top_label}' ({decoded[0][2]*100:.1f}%). Not a plant.")
+                     logger.info("[REJECTION] ImageNet detected '%s' (%.1f%%). Not a plant.", top_label, decoded[0][2] * 100)
                      return "__not_a_leaf__", 0.0
-
-        # === STAGE 3: Disease Classification (TF Model) ===
-        if not HAS_TF or model is None:
-            print("[Stage 3] TF model not loaded, cannot classify disease.")
-            return None
 
         # Predict probabilities
         predictions = model.predict(img_array)
@@ -348,47 +370,47 @@ def predict_image(image_bytes: bytes, force: bool = False):
         confidence = float(score[max_idx])
         predicted_class = CLASSES[max_idx]
 
-        print(f"[Stage 3] Prediction: {predicted_class} ({confidence*100:.2f}%)")
+        logger.info("[Stage 3] Prediction: %s (%.2f%%)", predicted_class, confidence * 100)
 
         # === STAGE 4: SHAPE-FIRST LOGIC ===
         # We only check the "Percentage" if the "Shape" passes first.
 
         if force:
-            print("[Stage 4] FORCE MODE: Skipping shape validation as per user confirmation.")
+            logger.info("[Stage 4] FORCE MODE: Skipping shape validation as per user confirmation.")
             CONFIDENCE_THRESHOLD = 0.40 # Still need some baseline
         elif papaya_status == "YES":
             # Shape is 100% Papaya.
             # User request: Keep the percentage for 60%
             CONFIDENCE_THRESHOLD = 0.60
-            print(f"[Stage 4] SHAPE VERIFIED: Using user-requested threshold ({CONFIDENCE_THRESHOLD*100}%)")
+            logger.info("[Stage 4] SHAPE VERIFIED: Using user-requested threshold (%s%%)", CONFIDENCE_THRESHOLD * 100)
 
         elif papaya_status == "NO":
             # Shape is definitely NOT Papaya.
-            print("[REJECTION] SHAPE MISMATCH: AI confirms this is not a papaya leaf.")
+            logger.info("[REJECTION] SHAPE MISMATCH: AI confirms this is not a papaya leaf.")
             return "__not_papaya__", 0.0
 
         else:
             # papaya_status == "FAIL" (Gemini API is Offline)
             # User request: Keep the percentage for 60%
             CONFIDENCE_THRESHOLD = 0.60
-            print(f"[Stage 4] SHAPE UNVERIFIED (API Offline): Using user-requested threshold ({CONFIDENCE_THRESHOLD*100}%)")
+            logger.warning("[Stage 4] SHAPE UNVERIFIED (API Offline): Using user-requested threshold (%s%%)", CONFIDENCE_THRESHOLD * 100)
 
         if confidence < CONFIDENCE_THRESHOLD:
             # User confirmation logic:
             # If it's between 30% and 60%, we mark it as "unsure" to ask the user.
             # Lowered from 40% to 30% to catch severely curled/damaged leaves.
             if not force and confidence > 0.30 and confidence < CONFIDENCE_THRESHOLD:
-                print(f"[UNSURE] {confidence*100:.2f}% is low but above 30%. Asking user.")
+                logger.info("[UNSURE] %.2f%% is low but above 30%%. Asking user.", confidence * 100)
                 return "__unsure_papaya__", confidence
 
-            print(f"[REJECTION] Pattern Confidence {confidence*100:.2f}% is too low (below 30%).")
+            logger.info("[REJECTION] Pattern Confidence %.2f%% is too low (below 30%%).", confidence * 100)
             return "__not_papaya__", confidence
 
-        print(f"[SUCCESS] High confidence detection: {predicted_class}")
+        logger.info("[SUCCESS] High confidence detection: %s", predicted_class)
         return predicted_class, confidence
 
-    except Exception as e:
-        print(f"Error during model prediction: {e}")
+    except Exception:
+        logger.exception("Error during model prediction.")
         return None
 
 TREATMENT_DB = {
@@ -588,21 +610,24 @@ if HAS_FASTAPI:
             try:
                 image_bytes = await file.read()
                 prediction = predict_image(image_bytes, force=force)
-                if prediction is not None:
-                    predicted_class, confidence = prediction
-                else:
-                    # If AI fails, we must NOT fall back to a default disease
-                    return {
-                        "disease_key": "invalid",
-                        "confidence": 0.0,
-                        "severity": 0.0,
-                        "status": "Error",
-                        "rejection_reason": "ai_failure",
-                        "message_en": "AI Analysis failed. Please try again.",
-                        "message_kn": "AI ವಿಶ್ಲೇಷಣೆ ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
-                    }
-            except Exception as e:
-                print(f"Error reading uploaded file: {e}")
+            except Exception:
+                logger.exception("Error reading uploaded file.")
+                prediction = None
+
+            if prediction is not None:
+                predicted_class, confidence = prediction
+            else:
+                # If AI fails, we must NOT fall back to a default disease
+                return {
+                    "disease_key": "invalid",
+                    "confidence": 0.0,
+                    "severity": 0.0,
+                    "status": "Error",
+                    "rejection_reason": "ai_failure",
+                    "message_en": "AI Analysis failed. Please try again.",
+                    "message_kn": "AI ವಿಶ್ಲೇಷಣೆ ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+                    "message_hi": "AI विश्लेषण विफल रहा। कृपया पुनः प्रयास करें।"
+                }
 
         # === Staged Rejection Responses ===
         # Ensure we return early and don't proceed to severity mapping
@@ -681,6 +706,18 @@ else:
     from urllib.parse import urlparse, parse_qs
 
     class FallbackAPIHandler(BaseHTTPRequestHandler):
+        def log_message(self, format, *args):
+            logger.info("%s - %s", self.address_string(), format % args)
+
+        def _send_error(self, exc: Exception):
+            logger.error("Unhandled error while serving %s", self.path, exc_info=exc)
+            try:
+                self._set_headers(500)
+                self.wfile.write(json.dumps({"error": "Internal server error"}).encode('utf-8'))
+            except OSError:
+                # The response was already (partially) sent or the client hung up.
+                logger.warning("Could not send the 500 response for %s.", self.path, exc_info=True)
+
         def _set_headers(self, status=200):
             self.send_response(status)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -693,6 +730,18 @@ else:
             self._set_headers(200)
 
         def do_GET(self):
+            try:
+                self._handle_get()
+            except Exception as e:
+                self._send_error(e)
+
+        def do_POST(self):
+            try:
+                self._handle_post()
+            except Exception as e:
+                self._send_error(e)
+
+        def _handle_get(self):
             parsed_path = urlparse(self.path)
             if parsed_path.path in ["/", "/health"]:
                 self._set_headers(200)
@@ -720,7 +769,7 @@ else:
                 self._set_headers(404)
                 self.wfile.write(json.dumps({"error": "Endpoint not found"}).encode('utf-8'))
 
-        def do_POST(self):
+        def _handle_post(self):
             parsed_path = urlparse(self.path)
             if parsed_path.path == "/api/v1/predict":
                 self._set_headers(200)
@@ -747,6 +796,6 @@ if __name__ == "__main__":
     if HAS_FASTAPI:
         uvicorn.run(app, host="0.0.0.0", port=8001)
     else:
-        print("Starting Python Built-in API Server on http://0.0.0.0:8001 ...")
+        logger.info("Starting Python Built-in API Server on http://0.0.0.0:8001 ...")
         server = HTTPServer(('0.0.0.0', 8001), FallbackAPIHandler)
         server.serve_forever()

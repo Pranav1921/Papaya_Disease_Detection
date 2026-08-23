@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack, kIsWeb;
 import 'package:http/http.dart' as http;
 import '../services/ml_prediction_service.dart';
 
@@ -23,6 +23,19 @@ class LeafRejectionException implements Exception {
     if (lang == 'hi') return messageHi;
     return messageEn;
   }
+}
+
+/// Thrown when the backend responds but the response cannot be used
+/// (non-200 status or a payload that is not valid prediction JSON).
+class BackendResponseException implements Exception {
+  final int? statusCode;
+  final String details;
+
+  const BackendResponseException({this.statusCode, required this.details});
+
+  @override
+  String toString() =>
+      'BackendResponseException(status: $statusCode, details: $details)';
 }
 
 class ApiBackendService {
@@ -94,14 +107,16 @@ class ApiBackendService {
             ],
             imagePath: imagePath,
           );
-          // Throw error for non-200 responses (e.g. server returned 500 or 404)
-          throw const LeafRejectionException(
-            reason: 'not_a_leaf',
-            messageEn: 'Unexpected response from the validation server.',
-            messageKn: 'ಸರ್ವರ್‌ನಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.',
-            messageHi: 'सर्वर से अप्रत्याशित प्रतिक्रिया मिली।',
-          );
         }
+
+        // Non-200 (e.g. server returned 500 or 404): surface it so the caller
+        // falls back deliberately instead of silently reusing stale state.
+        throw BackendResponseException(
+          statusCode: response.statusCode,
+          details: response.body.length > 500
+              ? response.body.substring(0, 500)
+              : response.body,
+        );
       } else {
         // Mock fallback if no image path
         final uri = Uri.parse('$baseUrl/api/v1/predict?disease_key=$diseaseKey');
@@ -126,25 +141,24 @@ class ApiBackendService {
             imagePath: imagePath,
           );
         } else {
-          throw const LeafRejectionException(
-            reason: 'not_a_leaf',
-            messageEn: 'Unexpected response from the validation server.',
-            messageKn: 'ಸರ್ವರ್‌ನಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.',
-            messageHi: 'सर्वर से अप्रत्याशित प्रतिक्रिया मिली।',
+          throw BackendResponseException(
+            statusCode: response.statusCode,
+            details: response.body.length > 500
+                ? response.body.substring(0, 500)
+                : response.body,
           );
         }
       }
-      throw const LeafRejectionException(
-        reason: 'not_a_leaf',
-        messageEn: 'Unable to analyze image. Please try again.',
-        messageKn: 'ಚಿತ್ರ ವಿಶ್ಲೇಷಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
-        messageHi: 'छवि का विश्लेषण करने में असमर्थ। कृपया पुनः प्रयास करें।',
-      );
     } on LeafRejectionException {
       rethrow; // Let scan_screen handle genuine AI rejection dialogs (not_a_leaf / not_papaya)
-    } catch (e) {
-      // Backend server is offline or unreachable (e.g., physical device on USB without server).
-      // Fall back seamlessly to embedded ML analysis so user always gets diagnosis.
+    } catch (e, stackTrace) {
+      // Backend is offline, unreachable, or replied with something unusable.
+      // Fall back to embedded ML analysis so the user always gets a diagnosis,
+      // but record why the backend result was discarded.
+      debugPrint(
+        'Backend prediction failed ($e); falling back to embedded ML analysis.',
+      );
+      debugPrintStack(stackTrace: stackTrace);
       return MLPredictionService.analyzeLeafImage(
         imagePath: imagePath,
       );
@@ -157,7 +171,8 @@ class ApiBackendService {
       final uri = Uri.parse('$baseUrl/');
       final response = await http.get(uri).timeout(const Duration(seconds: 2));
       return response.statusCode == 200;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Backend health check failed: $e');
       return false;
     }
   }

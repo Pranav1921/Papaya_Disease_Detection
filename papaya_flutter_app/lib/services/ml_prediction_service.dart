@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack;
 import 'package:image_picker/image_picker.dart';
 import '../models/disease_info.dart';
 import '../models/medicine_item.dart';
@@ -354,9 +355,11 @@ class MLPredictionService {
       final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
       image.dispose();
 
-      if (byteData == null) return 0.5; // allow through if null
+      final pixels = byteData?.buffer.asUint8List();
+      if (pixels == null || pixels.length < 4) {
+        throw _unreadableImageRejection;
+      }
 
-      final pixels = byteData.buffer.asUint8List();
       int greenPixels = 0;
       final int totalPixels = pixels.length ~/ 4;
 
@@ -384,10 +387,22 @@ class MLPredictionService {
       return greenRatio;
     } on LeafRejectionException {
       rethrow;
-    } catch (_) {
-      return 0.5;
+    } catch (e, stackTrace) {
+      // The image could not be decoded, so no leaf check was performed. Reject
+      // instead of letting an unverified image through as "probably a leaf".
+      debugPrint('Leaf validation failed to decode the image: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      throw _unreadableImageRejection;
     }
   }
+
+  static const LeafRejectionException _unreadableImageRejection =
+      LeafRejectionException(
+    reason: 'not_a_leaf',
+    messageEn: 'This image could not be read. Please capture the leaf again.',
+    messageKn: 'ಈ ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಫೋಟೋ ತೆಗೆಯಿರಿ.',
+    messageHi: 'यह छवि पढ़ी नहीं जा सकी। कृपया पत्ती की फोटो पुनः लें।',
+  );
 
   /// Analyzes an image and generates comprehensive diagnostic result.
   /// Throws [LeafRejectionException] if [imagePath] is null or image is not a leaf.
@@ -438,7 +453,11 @@ class MLPredictionService {
         const keys = ['powdery_mildew', 'ringspot_virus', 'leaf_curl'];
         detectedKey = keys[hash % keys.length];
       }
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Offline disease selection failed ($e); defaulting to powdery_mildew.',
+      );
+      debugPrintStack(stackTrace: stackTrace);
       detectedKey = 'powdery_mildew';
     }
 

@@ -28,6 +28,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
   List<CameraDescription> _cameras = [];
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
+  String? _cameraError;
 
   @override
   void initState() {
@@ -48,7 +49,12 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
   Future<void> _initializeCamera() async {
     try {
       _cameras = await availableCameras();
-      if (_cameras.isNotEmpty) {
+      if (_cameras.isEmpty) {
+        debugPrint('No cameras reported by the platform; gallery only.');
+        if (mounted) {
+          setState(() => _cameraError = 'No camera available on this device.');
+        }
+      } else {
         _cameraController = CameraController(
           _cameras.first,
           ResolutionPreset.medium,
@@ -61,19 +67,28 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
           });
         }
       }
-    } catch (e) {
-      debugPrint("Camera init error: $e");
+    } catch (e, stackTrace) {
+      debugPrint('Camera init error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _isCameraInitialized = false;
+          _cameraError = 'Camera unavailable: $e';
+        });
+      }
     }
   }
 
   Future<void> _takeInAppPhoto() async {
     if (_cameraController == null || !_isCameraInitialized) {
+      final String reason = _cameraError == null ? '' : ' ($_cameraError)';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _activeLanguage == 'kn'
-                ? 'ℹ️ ಸಿಮ್ಯುಲೇಟರ್ ಮೋಡ್: ಮಾದರಿ ಎಲೆ ಬಳಸಲಾಗುತ್ತಿದೆ.'
-                : (_activeLanguage == 'hi' ? 'सिम्युलेटर मोड: नमूना पत्ती का उपयोग किया जा रहा है।' : 'Simulator Mode: Using selected sample leaf.'),
+            (_activeLanguage == 'kn'
+                    ? 'ℹ️ ಸಿಮ್ಯುಲೇಟರ್ ಮೋಡ್: ಮಾದರಿ ಎಲೆ ಬಳಸಲಾಗುತ್ತಿದೆ.'
+                    : (_activeLanguage == 'hi' ? 'सिम्युलेटर मोड: नमूना पत्ती का उपयोग किया जा रहा है।' : 'Simulator Mode: Using selected sample leaf.')) +
+                reason,
           ),
           backgroundColor: AppTheme.forestGreen,
         ),
@@ -89,7 +104,10 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         _imagePath = photo.path;
         _isAnalyzing = false;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('Error taking picture: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
       setState(() => _isAnalyzing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error taking picture: $e')),
@@ -117,9 +135,12 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
           _imagePath = image.path;
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('Error picking image: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Error selecting image: $e')),
       );
     }
   }

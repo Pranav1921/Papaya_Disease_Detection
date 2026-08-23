@@ -1,10 +1,14 @@
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack;
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/ml_prediction_service.dart';
 
 class KannadaTtsService {
   static final FlutterTts _flutterTts = FlutterTts();
 
-  static Future<void> _initTts(String lang) async {
+  /// Configures the TTS engine. Returns false when the engine could not be
+  /// configured (e.g. the language pack is missing), so callers can tell the
+  /// user instead of silently playing nothing.
+  static Future<bool> _initTts(String lang) async {
     try {
       if (lang == 'kn') {
         await _flutterTts.setLanguage("kn-IN");
@@ -16,14 +20,18 @@ class KannadaTtsService {
       await _flutterTts.setSpeechRate(0.45); // Slower speech for farmers clarity
       await _flutterTts.setVolume(1.0);
       await _flutterTts.setPitch(1.0);
-    } catch (_) {
-      // Fallback gracefully
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Text-to-speech initialisation failed for "$lang": $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
     }
   }
 
   /// Speaks full diagnosis report in Kannada, English, or Hindi aloud
-  static Future<void> speakDiagnosisReport(MLPredictionResult result, {String language = 'kn'}) async {
-    await _initTts(language);
+  /// Returns false when the report could not be spoken.
+  static Future<bool> speakDiagnosisReport(MLPredictionResult result, {String language = 'kn'}) async {
+    if (!await _initTts(language)) return false;
 
     final disease = result.diseaseInfo;
     final speechText = StringBuffer();
@@ -67,12 +75,24 @@ class KannadaTtsService {
       }
     }
 
-    await _flutterTts.speak(speechText.toString());
+    return _speak(speechText.toString());
   }
 
-  static Future<void> speakText(String text, String language) async {
-    await _initTts(language);
-    await _flutterTts.speak(text);
+  /// Returns false when the text could not be spoken.
+  static Future<bool> speakText(String text, String language) async {
+    if (!await _initTts(language)) return false;
+    return _speak(text);
+  }
+
+  static Future<bool> _speak(String text) async {
+    try {
+      await _flutterTts.speak(text);
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Text-to-speech playback failed: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
   }
 
   static Future<void> pauseSpeech() async {

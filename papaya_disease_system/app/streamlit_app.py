@@ -1,9 +1,16 @@
+import logging
 import os
 import sys
 import requests
 import streamlit as st
 import numpy as np
 from PIL import Image
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("papaya.streamlit")
 
 # 1. Page Configuration
 st.set_page_config(
@@ -21,22 +28,26 @@ if SRC_DIR not in sys.path:
 try:
     from recommend import get_recommendation
 except ImportError:
+    logger.exception("Could not import src/recommend.py")
     st.error("⚠️ `src/recommend.py` ಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಫೈಲ್ ಸೇವ್ ಆಗಿದೆಯೇ ಪರಿಶೀಲಿಸಿ.")
     st.stop()
 
 try:
     from gradcam import get_gradcam_overlay
 except ImportError:
+    logger.warning("Grad-CAM module unavailable; heatmaps are disabled.", exc_info=True)
     get_gradcam_overlay = None
 
 try:
     from localization import generate_audio_guide
 except ImportError:
+    logger.warning("Localization module unavailable; audio guides are disabled.", exc_info=True)
     generate_audio_guide = lambda text, lang: None
 
 try:
     from weather import get_coastal_weather_risk
 except ImportError:
+    logger.warning("Weather module unavailable; risk advisory is disabled.", exc_info=True)
     get_coastal_weather_risk = lambda city: {"status": "ಹವಾಮಾನ ಮಾಹಿತಿ ಲಭ್ಯವಿಲ್ಲ", "advisory": "", "high_risk": False}
 
 # --- NEW: Automatic Location Finder ---
@@ -47,7 +58,9 @@ def auto_detect_user_district():
     """
     try:
         # Check network location
-        res = requests.get("http://ip-api.com/json/", timeout=2).json()
+        response = requests.get("http://ip-api.com/json/", timeout=2)
+        response.raise_for_status()
+        res = response.json()
         city = res.get("city", "").lower()
         region = res.get("regionName", "").lower()
         
@@ -61,7 +74,8 @@ def auto_detect_user_district():
         else:
             # Default fallback for coastal/mangaluru belt
             return "ಮಂಗಳೂರು (Mangaluru)"
-    except Exception:
+    except (requests.RequestException, ValueError):
+        logger.warning("IP geolocation failed; defaulting district to Mangaluru.", exc_info=True)
         return "ಮಂಗಳೂರು (Mangaluru)"
 
 # Auto-detect location on first page load
@@ -106,11 +120,13 @@ st.markdown("---")
 def load_trained_model():
     model_path = os.path.join(ROOT_DIR, "models", "papaya_model.keras")
     if not os.path.exists(model_path):
+        logger.error("Trained model not found at %s", model_path)
         return None
     try:
         import tensorflow as tf
         return tf.keras.models.load_model(model_path)
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to load the trained model from %s", model_path)
         return None
 
 def get_class_names():
@@ -132,6 +148,7 @@ if uploaded_file is not None:
     try:
         image = Image.open(uploaded_file).convert('RGB')
     except Exception:
+        logger.exception("Uploaded file could not be decoded as an image.")
         st.error("❌ ದಯವಿಟ್ಟು ಸರಿಯಾದ ಫೋಟೋ (JPG/PNG) ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.")
         st.stop()
 
@@ -153,7 +170,7 @@ if uploaded_file is not None:
                 files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
                 response = requests.post(API_URL, files=files, timeout=12)
                 
-                if response.statusCode == 200 or response.status_code == 200:
+                if response.status_code == 200:
                     res_data = response.json()
                     
                     # Check for staged AI rejections
@@ -172,15 +189,23 @@ if uploaded_file is not None:
                     severity = res_data.get("severity", 0.0)
                     status = res_data.get("status", "Healthy")
                 else:
-                    # Fallback to local mockup if API server is down
-                    st.warning("⚠️ **ಸರ್ವರ್ ಸಂಪರ್ಕ ವಿಫಲವಾಗಿದೆ (Server Offline Fallback)**")
-                    predicted_class_name = "powdery_mildew"
-                    confidence = 92.40
-            except Exception as e:
-                # Fallback to local mockup on connection errors
-                st.warning("⚠️ **ಸರ್ವರ್ ಸಂಪರ್ಕ ವಿಫಲವಾಗಿದೆ (Server Offline Fallback)**")
-                predicted_class_name = "powdery_mildew"
-                confidence = 92.40
+                    logger.error(
+                        "Prediction API returned HTTP %s: %s",
+                        response.status_code,
+                        response.text[:500],
+                    )
+                    st.error(
+                        "⚠️ **ಸರ್ವರ್ ದೋಷ (Server Error)** — "
+                        f"HTTP {response.status_code}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+                    )
+                    st.stop()
+            except (requests.RequestException, ValueError) as e:
+                logger.exception("Prediction API call failed.")
+                st.error(
+                    "⚠️ **ಸರ್ವರ್ ಸಂಪರ್ಕ ವಿಫಲವಾಗಿದೆ (Server Unreachable)** — "
+                    f"{type(e).__name__}. ಬ್ಯಾಕ್‌ಎಂಡ್ ಸರ್ವರ್ ಚಾಲೂ ಇದೆಯೇ ಪರಿಶೇಲಿಸಿ."
+                )
+                st.stop()
                 
         st.metric(label="ಖಚಿತತೆ (Confidence Score)", value=f"{confidence:.1f}%")
         rec = get_recommendation(predicted_class_name)

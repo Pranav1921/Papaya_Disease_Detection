@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack;
 import 'package:http/http.dart' as http;
 import '../models/agri_news.dart';
 import 'api_backend_service.dart';
@@ -124,8 +125,9 @@ class NewsService {
           }).toList();
         }
       }
-    } catch (e) {
-      print("Error fetching dynamic news: $e");
+    } catch (e, stackTrace) {
+      debugPrint('Error fetching dynamic news ($e); serving bundled news.');
+      debugPrintStack(stackTrace: stackTrace);
     }
     return _newsList; // Fallback to local offline cache
   }

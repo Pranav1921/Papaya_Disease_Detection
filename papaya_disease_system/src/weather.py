@@ -1,6 +1,10 @@
 # src/weather.py
-import requests
+import logging
 import random
+
+import requests
+
+logger = logging.getLogger(__name__)
 
 def get_coastal_weather_risk(city="Mangaluru", api_key=None):
     """
@@ -9,12 +13,15 @@ def get_coastal_weather_risk(city="Mangaluru", api_key=None):
     if api_key:
         try:
             url = f"http://api.openweathermap.org/data/2.5/weather?q={city},IN&appid={api_key}&units=metric"
-            res = requests.get(url, timeout=3).json()
+            response = requests.get(url, timeout=3)
+            response.raise_for_status()
+            res = response.json()
             humidity = res['main']['humidity']
             temp = res['main']['temp']
             rain = 'rain' in res
-        except Exception:
+        except (requests.RequestException, ValueError, KeyError):
             # Fallback to simulated data if network/key fails
+            logger.warning("Weather lookup for %s failed; using simulated monsoon values.", city, exc_info=True)
             humidity, temp, rain = 88, 27.5, True
     else:
         # Simulated realistic Coastal Karnataka monsoon conditions

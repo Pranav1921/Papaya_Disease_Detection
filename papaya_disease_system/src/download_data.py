@@ -1,16 +1,14 @@
 import os
 import shutil
+import sys
+
 import kagglehub
 
 def setup_dataset():
     print("[INFO] Downloading dataset from Kaggle...")
     # Download latest version from Kaggle
-    try:
-        cache_path = kagglehub.dataset_download("ajithdari/papaya-leaf-disease-dataset")
-        print(f"[SUCCESS] Downloaded to cache: {cache_path}")
-    except Exception as e:
-        print(f"[ERROR] Kaggle download failed: {e}")
-        return
+    cache_path = kagglehub.dataset_download("ajithdari/papaya-leaf-disease-dataset")
+    print(f"[SUCCESS] Downloaded to cache: {cache_path}")
 
     # Define our target project directory relative to this script
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -69,4 +67,9 @@ def setup_dataset():
     print("Next step: Run 'python src/train.py' to retrain the model.")
 
 if __name__ == "__main__":
-    setup_dataset()
+    try:
+        setup_dataset()
+    except Exception as e:
+        # Exit non-zero so callers (CI, shell scripts) can detect the failure.
+        print(f"[ERROR] Dataset setup failed: {e}", file=sys.stderr)
+        raise SystemExit(1) from e

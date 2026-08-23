@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/ml_prediction_service.dart';
@@ -22,8 +23,9 @@ class OfflineCacheService {
         final String fileName = 'scan_${DateTime.now().millisecondsSinceEpoch}.jpg';
         final File localImage = await File(result.imagePath!).copy('${appDocDir.path}/$fileName');
         persistentPath = localImage.path;
-      } catch (e) {
-        print("Error saving image to permanent storage: $e");
+      } catch (e, stackTrace) {
+        debugPrint('Error saving image to permanent storage: $e');
+        debugPrintStack(stackTrace: stackTrace);
         persistentPath = result.imagePath; // Fallback to original path
       }
     }
@@ -50,7 +52,10 @@ class OfflineCacheService {
           final oldFile = File(lastItem['image_path']);
           if (oldFile.existsSync()) await oldFile.delete();
         }
-      } catch (_) {}
+      } catch (e) {
+        // A stale/corrupt entry must not stop the history from being trimmed.
+        debugPrint('Could not delete the image of the evicted scan entry: $e');
+      }
       history = history.sublist(0, 10);
     }
 
@@ -62,7 +67,16 @@ class OfflineCacheService {
     final prefs = await SharedPreferences.getInstance();
     List<String> history = prefs.getStringList(_keyScanHistory) ?? [];
 
-    return history.map((item) => jsonDecode(item) as Map<String, dynamic>).toList();
+    final entries = <Map<String, dynamic>>[];
+    for (final item in history) {
+      try {
+        entries.add(jsonDecode(item) as Map<String, dynamic>);
+      } catch (e) {
+        // Skip corrupt entries instead of failing the whole history load.
+        debugPrint('Skipping corrupt cached scan entry: $e');
+      }
+    }
+    return entries;
   }
 
   /// Saves auto-detected user district

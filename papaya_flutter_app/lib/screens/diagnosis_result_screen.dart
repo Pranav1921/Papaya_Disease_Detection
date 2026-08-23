@@ -40,7 +40,29 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
     _activeLanguage = widget.language;
     _tabController = TabController(length: 4, vsync: this);
     _nearestShops = ShopLocationService.getShopsWithinRadius(maxDistanceKm: 100.0);
-    OfflineCacheService.saveScanResultOffline(widget.result);
+    _cacheResultOffline();
+  }
+
+  Future<void> _cacheResultOffline() async {
+    try {
+      await OfflineCacheService.saveScanResultOffline(widget.result);
+    } catch (e, stackTrace) {
+      debugPrint('Could not cache the scan result offline: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This scan could not be saved to offline history.'),
+        ),
+      );
+    }
+  }
+
+  void _showFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -52,8 +74,14 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
 
   void _playTts() async {
     setState(() => _ttsState = TtsState.playing);
-    await KannadaTtsService.speakDiagnosisReport(widget.result, language: _activeLanguage);
+    final bool spoken = await KannadaTtsService.speakDiagnosisReport(
+      widget.result,
+      language: _activeLanguage,
+    );
     if (mounted) setState(() => _ttsState = TtsState.stopped);
+    if (!spoken) {
+      _showFailure('Audio playback is unavailable on this device.');
+    }
   }
 
   void _pauseTts() async {
@@ -68,25 +96,38 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
 
   void _exportPdfPrescription() async {
     final topShop = _nearestShops.isNotEmpty ? _nearestShops.first : null;
-    await PdfPrescriptionService.printOrSharePdf(
-      result: widget.result,
-      shopName: topShop != null ? topShop.getName(_activeLanguage) : 'Agricultural Information Center',
-      shopPhone: topShop != null ? topShop.phone : '+91 8251 230455',
-    );
+    try {
+      await PdfPrescriptionService.printOrSharePdf(
+        result: widget.result,
+        shopName: topShop != null ? topShop.getName(_activeLanguage) : 'Agricultural Information Center',
+        shopPhone: topShop != null ? topShop.phone : '+91 8251 230455',
+      );
+    } catch (e, stackTrace) {
+      debugPrint('PDF prescription export failed: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      _showFailure('The prescription PDF could not be generated.');
+    }
   }
 
-  Future<void> _launchMaps(double lat, double lng) async {
+  Future<void> _launchUri(Uri uri, String failureMessage) async {
+    try {
+      if (await canLaunchUrl(uri) && await launchUrl(uri)) return;
+      debugPrint('No handler available for $uri');
+    } catch (e, stackTrace) {
+      debugPrint('Failed to launch $uri: $e');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+    _showFailure(failureMessage);
+  }
+
+  Future<void> _launchMaps(double lat, double lng) {
     final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    }
+    return _launchUri(url, 'Could not open Maps on this device.');
   }
 
-  Future<void> _launchCaller(String phoneNumber) async {
+  Future<void> _launchCaller(String phoneNumber) {
     final uri = Uri.parse('tel:$phoneNumber');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
+    return _launchUri(uri, 'Could not start a call on this device.');
   }
 
   @override
