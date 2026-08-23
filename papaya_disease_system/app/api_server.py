@@ -685,7 +685,7 @@ else:
                 key = query_params.get("disease_key", ["powdery_mildew"])[0]
                 
                 # Mock response format to match FastAPI predict JSON structure
-                severity = severity_for(key) if key in severity_map else 50.0
+                severity = severity_for(key, default=50.0)
                 status = status_for(severity)
                 
                 result = {

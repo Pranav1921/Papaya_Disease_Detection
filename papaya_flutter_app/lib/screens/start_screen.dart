@@ -13,8 +13,7 @@ class StartScreen extends StatefulWidget {
   State<StartScreen> createState() => _StartScreenState();
 }
 
-class _StartScreenState extends State<StartScreen>
-    with SingleTickerProviderStateMixin {
+class _StartScreenState extends State<StartScreen> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _scaleAnimation;
   String _selectedLanguage = 'kn'; // Kannada default
@@ -45,7 +44,9 @@ class _StartScreenState extends State<StartScreen>
         children: [
           // Base gradient
           Container(
-            decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
+            decoration: const BoxDecoration(
+              gradient: AppTheme.heroGradient,
+            ),
           ),
           // Saffron glow top-left
           Positioned(
@@ -92,10 +93,7 @@ class _StartScreenState extends State<StartScreen>
               children: [
                 // Top Bar: Language Toggle
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -108,44 +106,14 @@ class _StartScreenState extends State<StartScreen>
                         ),
                         child: LanguageDropdown(
                           value: _selectedLanguage,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'kn',
-                              child: Text('ಕನ್ನಡ (Kannada)'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'en',
-                              child: Text('English'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'hi',
-                              child: Text('हिन्दी (Hindi)'),
-                            ),
-                          ],
-                          selectedItemBuilder: (BuildContext context) {
-                            return ['KN', 'EN', 'HI'].map<Widget>((
-                              String item,
-                            ) {
-                              return Center(
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                            }).toList();
-                          },
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                          useShortLabels: true,
+                          useExtendedMenuLabels: true,
                           iconSize: 18,
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _selectedLanguage = val);
+                            }
                           },
                         ),
                       ),
@@ -163,12 +131,7 @@ class _StartScreenState extends State<StartScreen>
                       const SizedBox(height: 60),
                       // App Title
                       Text(
-                        pickLocalized(
-                          _selectedLanguage,
-                          kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ',
-                          hi: 'पपीता रोग पहचान',
-                          en: 'Papaya Disease Detection',
-                        ),
+                        pickLocalized(_selectedLanguage, kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ', hi: 'पपीता रोग पहचान', en: 'Papaya Disease Detection'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.notoSansKannada(
                           fontSize: 30,
@@ -190,18 +153,11 @@ class _StartScreenState extends State<StartScreen>
                       SizedBox(
                         height: 50,
                         child: AnimatedTextKit(
-                          key: ValueKey(
-                            _selectedLanguage,
-                          ), // Rebuild when language changes
+                          key: ValueKey(_selectedLanguage), // Rebuild when language changes
                           repeatForever: true,
                           animatedTexts: [
                             FadeAnimatedText(
-                              pickLocalized(
-                                _selectedLanguage,
-                                kn: '📸 ಎಲೆ ಫೋಟೋ ಹಾಕಿ ರೋಗ ಪತ್ತೆ ಮಾಡಿ',
-                                hi: '📸 पत्ती की फोटो डालकर बीमारी का पता लगाएं',
-                                en: '📸 Scan leaf to detect disease',
-                              ),
+                              pickLocalized(_selectedLanguage, kn: '📸 ಎಲೆ ಫೋಟೋ ಹಾಕಿ ರೋಗ ಪತ್ತೆ ಮಾಡಿ', hi: '📸 पत्ती की फोटो डालकर बीमारी का पता लगाएं', en: '📸 Scan leaf to detect disease'),
                               textStyle: GoogleFonts.notoSansKannada(
                                 fontSize: 15,
                                 color: AppTheme.leafGold,
@@ -210,12 +166,7 @@ class _StartScreenState extends State<StartScreen>
                               duration: const Duration(seconds: 4),
                             ),
                             FadeAnimatedText(
-                              pickLocalized(
-                                _selectedLanguage,
-                                kn: '💰 ಔಷಧ ಮತ್ತು ಹತ್ತಿರದ ಅಂಗಡಿ ಮಾಹಿತಿ',
-                                hi: '💰 दवाओं और नजदीकी दुकान की जानकारी',
-                                en: '💰 Get medicine & nearby shop info',
-                              ),
+                              pickLocalized(_selectedLanguage, kn: '💰 ಔಷಧ ಮತ್ತು ಹತ್ತಿರದ ಅಂಗಡಿ ಮಾಹಿತಿ', hi: '💰 दवाओं और नजदीकी दुकान की जानकारी', en: '💰 Get medicine & nearby shop info'),
                               textStyle: GoogleFonts.notoSansKannada(
                                 fontSize: 15,
                                 color: Colors.white70,
@@ -234,10 +185,7 @@ class _StartScreenState extends State<StartScreen>
 
                 // Start Button Area
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 30,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
                   child: ScaleTransition(
                     scale: _scaleAnimation,
                     child: Container(
@@ -258,10 +206,9 @@ class _StartScreenState extends State<StartScreen>
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => HomeDashboardScreen(
-                                    language: _selectedLanguage,
-                                  ),
+                              builder: (context) => HomeDashboardScreen(
+                                language: _selectedLanguage,
+                              ),
                             ),
                           );
                         },
@@ -279,12 +226,7 @@ class _StartScreenState extends State<StartScreen>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                pickLocalized(
-                                  _selectedLanguage,
-                                  kn: '🚀 ಪ್ರಾರಂಭಿಸಿ',
-                                  hi: '🚀 शुरू करें',
-                                  en: '🚀 Get Started',
-                                ),
+                                pickLocalized(_selectedLanguage, kn: '🚀 ಪ್ರಾರಂಭಿಸಿ', hi: '🚀 शुरू करें', en: '🚀 Get Started'),
                                 style: GoogleFonts.notoSansKannada(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -292,11 +234,7 @@ class _StartScreenState extends State<StartScreen>
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              const Icon(
-                                Icons.arrow_forward_rounded,
-                                color: AppTheme.darkMoss,
-                                size: 26,
-                              ),
+                              const Icon(Icons.arrow_forward_rounded, color: AppTheme.darkMoss, size: 26),
                             ],
                           ),
                         ),

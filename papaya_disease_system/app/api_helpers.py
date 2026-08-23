@@ -32,8 +32,8 @@ def shops_within_radius(shops, lat: float, lng: float, radius_km: float):
     return filtered
 
 
-def severity_for(disease_key: str) -> float:
-    base_severity = severity_map[disease_key]
+def severity_for(disease_key: str, default: float = 0.0) -> float:
+    base_severity = severity_map.get(disease_key, default)
     return round(base_severity + random.uniform(-4, 4), 1) if disease_key not in ("healthy", "background") else 0.0
 
 

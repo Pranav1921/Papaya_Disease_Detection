@@ -66,74 +66,34 @@ class DiseaseInfo {
   }
 
   String getTitle(String lang) {
-    return pickLocalized(
-      lang,
-      kn: titleKannada,
-      en: titleEnglish,
-      hi: titleHindi,
-    );
+    return pickLocalized(lang, kn: titleKannada, en: titleEnglish, hi: titleHindi);
   }
 
   String getSeverityLevel(String lang) {
-    return pickLocalized(
-      lang,
-      kn: severityLevelKannada,
-      en: severityLevelEnglish,
-      hi: severityLevelHindi,
-    );
+    return pickLocalized(lang, kn: severityLevelKannada, en: severityLevelEnglish, hi: severityLevelHindi);
   }
 
   String getDescription(String lang) {
-    return pickLocalized(
-      lang,
-      kn: descriptionKannada,
-      en: descriptionEnglish,
-      hi: descriptionHindi,
-    );
+    return pickLocalized(lang, kn: descriptionKannada, en: descriptionEnglish, hi: descriptionHindi);
   }
 
   String getChemicalTreatment(String lang) {
-    return pickLocalized(
-      lang,
-      kn: chemicalTreatmentKannada,
-      en: chemicalTreatmentEnglish,
-      hi: chemicalTreatmentHindi,
-    );
+    return pickLocalized(lang, kn: chemicalTreatmentKannada, en: chemicalTreatmentEnglish, hi: chemicalTreatmentHindi);
   }
 
   String getOrganicTreatment(String lang) {
-    return pickLocalized(
-      lang,
-      kn: organicTreatmentKannada,
-      en: organicTreatmentEnglish,
-      hi: organicTreatmentHindi,
-    );
+    return pickLocalized(lang, kn: organicTreatmentKannada, en: organicTreatmentEnglish, hi: organicTreatmentHindi);
   }
 
   String getFertilizerSchedule(String lang) {
-    return pickLocalized(
-      lang,
-      kn: fertilizerScheduleKannada,
-      en: fertilizerScheduleEnglish,
-      hi: fertilizerScheduleHindi,
-    );
+    return pickLocalized(lang, kn: fertilizerScheduleKannada, en: fertilizerScheduleEnglish, hi: fertilizerScheduleHindi);
   }
 
   String getPreventiveCare(String lang) {
-    return pickLocalized(
-      lang,
-      kn: preventiveCareKannada,
-      en: preventiveCareEnglish,
-      hi: preventiveCareHindi,
-    );
+    return pickLocalized(lang, kn: preventiveCareKannada, en: preventiveCareEnglish, hi: preventiveCareHindi);
   }
 
   String getSafetyInterval(String lang) {
-    return pickLocalized(
-      lang,
-      kn: safetyIntervalKannada,
-      en: safetyIntervalEnglish,
-      hi: safetyIntervalHindi,
-    );
+    return pickLocalized(lang, kn: safetyIntervalKannada, en: safetyIntervalEnglish, hi: safetyIntervalHindi);
   }
 }

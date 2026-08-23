@@ -56,41 +56,30 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => DiagnosisResultScreen(
-              result: result,
-              language: _activeLanguage,
-            ),
+        builder: (context) => DiagnosisResultScreen(
+          result: result,
+          language: _activeLanguage,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          pickLocalized(
-            _activeLanguage,
-            kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ',
-            hi: 'पपीता रोग पहचान',
-            en: 'Papaya Disease Detection',
-          ),
-          style: GoogleFonts.notoSansKannada(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          pickLocalized(_activeLanguage, kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ', hi: 'पपीता रोग पहचान', en: 'Papaya Disease Detection'),
+          style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
           LanguageDropdown(
             value: _activeLanguage,
-            items: const [
-              DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
-              DropdownMenuItem(value: 'en', child: Text('English')),
-              DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
-            ],
             onChanged: (val) {
-              if (val != null) setState(() => _activeLanguage = val);
+              if (val != null) {
+                setState(() => _activeLanguage = val);
+              }
             },
           ),
         ],
@@ -104,9 +93,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               onTap: () async {
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => ScanScreen(language: _activeLanguage),
-                  ),
+                  MaterialPageRoute(builder: (context) => ScanScreen(language: _activeLanguage)),
                 );
                 _loadHistory(); // Refresh history when coming back
               },
@@ -121,26 +108,17 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       color: AppTheme.forestGreen.withOpacity(0.4),
                       blurRadius: 25,
                       spreadRadius: 5,
-                    ),
+                    )
                   ],
                   border: Border.all(color: AppTheme.leafGold, width: 4),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.camera_alt_rounded,
-                      color: AppTheme.leafGold,
-                      size: 60,
-                    ),
+                    const Icon(Icons.camera_alt_rounded, color: AppTheme.leafGold, size: 60),
                     const SizedBox(height: 10),
                     Text(
-                      pickLocalized(
-                        _activeLanguage,
-                        kn: 'ಎಲೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
-                        hi: 'पत्ती स्कैन करें',
-                        en: 'Scan Leaf',
-                      ),
+                      pickLocalized(_activeLanguage, kn: 'ಎಲೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ', hi: 'पत्ती स्कैन करें', en: 'Scan Leaf'),
                       style: GoogleFonts.notoSansKannada(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -161,12 +139,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 const Icon(Icons.history_rounded, color: AppTheme.forestGreen),
                 const SizedBox(width: 8),
                 Text(
-                  pickLocalized(
-                    _activeLanguage,
-                    kn: 'ಹಿಂದಿನ ತಪಾಸಣೆಗಳು',
-                    hi: 'पुराना इतिहास',
-                    en: 'Recent History',
-                  ),
+                  pickLocalized(_activeLanguage, kn: 'ಹಿಂದಿನ ತಪಾಸಣೆಗಳು', hi: 'पुराना इतिहास', en: 'Recent History'),
                   style: GoogleFonts.notoSansKannada(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -179,27 +152,21 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           const SizedBox(height: 10),
           // History List
           Expanded(
-            child:
-                _scanHistory.isEmpty
-                    ? Center(
-                      child: Text(
-                        pickLocalized(
-                          _activeLanguage,
-                          kn: 'ಯಾವುದೇ ಇತಿಹಾಸವಿಲ್ಲ',
-                          hi: 'कोई इतिहास नहीं',
-                          en: 'No history found',
-                        ),
-                        style: const TextStyle(color: AppTheme.textMuted),
-                      ),
-                    )
-                    : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _scanHistory.length,
-                      itemBuilder: (context, index) {
-                        final item = _scanHistory[index];
-                        return _buildHistoryCard(item, _activeLanguage);
-                      },
+            child: _scanHistory.isEmpty
+                ? Center(
+                    child: Text(
+                      pickLocalized(_activeLanguage, kn: 'ಯಾವುದೇ ಇತಿಹಾಸವಿಲ್ಲ', hi: 'कोई इतिहास नहीं', en: 'No history found'),
+                      style: const TextStyle(color: AppTheme.textMuted),
                     ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _scanHistory.length,
+                    itemBuilder: (context, index) {
+                      final item = _scanHistory[index];
+                      return _buildHistoryCard(item, _activeLanguage);
+                    },
+                  ),
           ),
         ],
       ),
@@ -207,12 +174,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildHistoryCard(Map<String, dynamic> item, String lang) {
+
     // Severity mapping
     double severity = (item['severity_percent'] as num?)?.toDouble() ?? 0.0;
-    Color severityColor =
-        severity > 80
-            ? Colors.red
-            : (severity > 50 ? Colors.orange : AppTheme.emeraldGreen);
+    Color severityColor = severity > 80 ? Colors.red : (severity > 50 ? Colors.orange : AppTheme.emeraldGreen);
 
     final String? imagePath = item['image_path'];
     final bool hasImage = imagePath != null && File(imagePath).existsSync();
@@ -229,10 +194,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             width: 50,
             height: 50,
             color: severityColor.withOpacity(0.1),
-            child:
-                hasImage
-                    ? Image.file(File(imagePath), fit: BoxFit.cover)
-                    : Icon(Icons.eco_rounded, color: severityColor),
+            child: hasImage
+              ? Image.file(File(imagePath), fit: BoxFit.cover)
+              : Icon(Icons.eco_rounded, color: severityColor),
           ),
         ),
         title: Text(
@@ -245,11 +209,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             Text(item['date'] ?? '', style: const TextStyle(fontSize: 11)),
             Text(
               '${pickLocalized(lang, kn: 'ತೀವ್ರತೆ', hi: 'तीव्रता', en: 'Severity')}: ${severity.toInt()}%',
-              style: TextStyle(
-                color: severityColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: severityColor, fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ],
         ),

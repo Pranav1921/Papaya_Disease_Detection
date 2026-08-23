@@ -63,11 +63,6 @@ class AgriShop {
   }
 
   String getAddress(String lang) {
-    return pickLocalized(
-      lang,
-      kn: addressKannada,
-      en: addressEnglish,
-      hi: addressHindi,
-    );
+    return pickLocalized(lang, kn: addressKannada, en: addressEnglish, hi: addressHindi);
   }
 }

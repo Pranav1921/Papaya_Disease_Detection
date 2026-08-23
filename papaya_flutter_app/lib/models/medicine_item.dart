@@ -52,29 +52,14 @@ class MedicineItem {
   }
 
   String getDosage(String lang) {
-    return pickLocalized(
-      lang,
-      kn: dosageKannada,
-      en: dosageEnglish,
-      hi: dosageHindi,
-    );
+    return pickLocalized(lang, kn: dosageKannada, en: dosageEnglish, hi: dosageHindi);
   }
 
   String getPackageSize(String lang) {
-    return pickLocalized(
-      lang,
-      kn: packageSizeKannada,
-      en: packageSizeEnglish,
-      hi: packageSizeHindi,
-    );
+    return pickLocalized(lang, kn: packageSizeKannada, en: packageSizeEnglish, hi: packageSizeHindi);
   }
 
   String getDescription(String lang) {
-    return pickLocalized(
-      lang,
-      kn: descriptionKannada,
-      en: descriptionEnglish,
-      hi: descriptionHindi,
-    );
+    return pickLocalized(lang, kn: descriptionKannada, en: descriptionEnglish, hi: descriptionHindi);
   }
 }

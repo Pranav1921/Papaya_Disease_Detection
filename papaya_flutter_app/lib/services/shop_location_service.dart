@@ -137,17 +137,13 @@ class ShopLocationService {
 
   /// Computes distance using Haversine formula in Kilometers
   static double calculateHaversineDistance(
-    double lat1,
-    double lon1,
-    double lat2,
-    double lon2,
+    double lat1, double lon1, double lat2, double lon2,
   ) {
     const double earthRadiusKm = 6371.0;
     double dLat = _degreesToRadians(lat2 - lat1);
     double dLon = _degreesToRadians(lon2 - lon1);
 
-    double a =
-        sin(dLat / 2) * sin(dLat / 2) +
+    double a = sin(dLat / 2) * sin(dLat / 2) +
         cos(_degreesToRadians(lat1)) *
             cos(_degreesToRadians(lat2)) *
             sin(dLon / 2) *
@@ -167,20 +163,13 @@ class ShopLocationService {
     double userLng = defaultUserLng,
     double maxDistanceKm = 100.0,
   }) {
-    List<AgriShop> updatedList =
-        _masterShopsList.map((shop) {
-          double dist = calculateHaversineDistance(
-            userLat,
-            userLng,
-            shop.latitude,
-            shop.longitude,
-          );
-          return shop.copyWithDistance(dist);
-        }).toList();
+    List<AgriShop> updatedList = _masterShopsList.map((shop) {
+      double dist = calculateHaversineDistance(userLat, userLng, shop.latitude, shop.longitude);
+      return shop.copyWithDistance(dist);
+    }).toList();
 
     // Filter shops strictly less than maxDistanceKm (100km)
-    List<AgriShop> filtered =
-        updatedList.where((shop) => shop.distanceKm <= maxDistanceKm).toList();
+    List<AgriShop> filtered = updatedList.where((shop) => shop.distanceKm <= maxDistanceKm).toList();
 
     // Sort by distance ascending
     filtered.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));

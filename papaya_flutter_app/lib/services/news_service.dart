@@ -7,19 +7,15 @@ class NewsService {
   static final List<AgriNews> _newsList = [
     const AgriNews(
       id: 'news_1',
-      titleKannada:
-          'ಪಪ್ಪಾಯಿ ಬೀಜ ಹಾಗೂ ಜೈವಿಕ ಗೊಬ್ಬರಕ್ಕೆ 50% ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ ಲಭ್ಯ!',
+      titleKannada: 'ಪಪ್ಪಾಯಿ ಬೀಜ ಹಾಗೂ ಜೈವಿಕ ಗೊಬ್ಬರಕ್ಕೆ 50% ಸರ್ಕಾರಿ ಸಬ್ಸಿಡಿ ಲಭ್ಯ!',
       titleEnglish: '50% Govt Subsidy on Papaya Seeds & Bio-fertilizers at RSK',
       titleHindi: 'पपीता बीज और जैविक खाद पर 50% सरकारी सब्सिडी उपलब्ध!',
       categoryKannada: '🌾 ಸರ್ಕಾರಿ ಯೋಜನೆ',
       categoryEnglish: '🌾 Govt Scheme',
       categoryHindi: '🌾 सरकारी योजना',
-      summaryKannada:
-          'ನಿಮ್ಮ ತಾಲೂಕಿನ ರೈತ ಸಂಪರ್ಕ ಕೇಂದ್ರದಲ್ಲಿ (RSK) ಸುಡೋಮೊನಾಸ್ ಮತ್ತು ಟ್ರೈಕೋಡರ್ಮಾ ಜೈವಿಕ ಗೊಬ್ಬರಗಳಿಗೆ 50% ರಿಯಾಯಿತಿ ನೀಡಲಾಗುತ್ತಿದೆ.',
-      summaryEnglish:
-          'Get a 50% discount on Pseudomonas and Trichoderma bio-fertilizers at your local Raitha Samparka Kendra (RSK).',
-      summaryHindi:
-          'आपके तालुक के रायता संपर्क केंद्र (RSK) में स्यूडोमोनास और ट्राइकोडेर्मा जैविक खादों पर 50% की छूट दी जा रही है।',
+      summaryKannada: 'ನಿಮ್ಮ ತಾಲೂಕಿನ ರೈತ ಸಂಪರ್ಕ ಕೇಂದ್ರದಲ್ಲಿ (RSK) ಸುಡೋಮೊನಾಸ್ ಮತ್ತು ಟ್ರೈಕೋಡರ್ಮಾ ಜೈವಿಕ ಗೊಬ್ಬರಗಳಿಗೆ 50% ರಿಯಾಯಿತಿ ನೀಡಲಾಗುತ್ತಿದೆ.',
+      summaryEnglish: 'Get a 50% discount on Pseudomonas and Trichoderma bio-fertilizers at your local Raitha Samparka Kendra (RSK).',
+      summaryHindi: 'आपके तालुक के रायता संपर्क केंद्र (RSK) में स्यूडोमोनास और ट्राइकोडेर्मा जैविक खादों पर 50% की छूट दी जा रही है।',
       dateKannada: 'ಇಂದು, 23 ಜುಲೈ 2026',
       dateEnglish: 'Today, 23 July 2026',
       dateHindi: 'आज, 23 जुलाई 2026',
@@ -31,21 +27,15 @@ class NewsService {
     ),
     const AgriNews(
       id: 'news_2',
-      titleKannada:
-          'ಕರಾವಳಿ ಮತ್ತು ಮಲೆನಾಡು ಭಾಗದಲ್ಲಿ ಪಪ್ಪಾಯಿ ಬೂದಿ ರೋಗದ ಮುನ್ನೆಚ್ಚರಿಕೆ!',
-      titleEnglish:
-          'High Humidity Fungal Alert for Coastal & Malnad Papaya Farmers',
-      titleHindi:
-          'तटीय और मलनाड क्षेत्रों में पपीते के पाउडर फफूंद रोग की चेतावनी!',
+      titleKannada: 'ಕರಾವಳಿ ಮತ್ತು ಮಲೆನಾಡು ಭಾಗದಲ್ಲಿ ಪಪ್ಪಾಯಿ ಬೂದಿ ರೋಗದ ಮುನ್ನೆಚ್ಚರಿಕೆ!',
+      titleEnglish: 'High Humidity Fungal Alert for Coastal & Malnad Papaya Farmers',
+      titleHindi: 'तटीय और मलनाड क्षेत्रों में पपीते के पाउडर फफूंद रोग की चेतावनी!',
       categoryKannada: '🌦️ ಹವಾಮಾನ ರೋಗ ಎಚ್ಚರಿಕೆ',
       categoryEnglish: '🌦️ Weather Alert',
       categoryHindi: '🌦️ मौसम रोग चेतावनी',
-      summaryKannada:
-          'ಮಂಗಳೂರು, ಉಡುಪಿ, ಪುತ್ತೂರು ಭಾಗಗಳಲ್ಲಿ ತೇವಾಂಶ 85% ಕ್ಕಿಂತ ಹೆಚ್ಚಿದ್ದು ಬೂದಿ ರೋಗ ಹರಡುವ ಸಾಧ್ಯತೆ ಇದೆ. ಕಾಂಟಾಫ್ 1ml ಸಿಂಪಡಿಸಿ.',
-      summaryEnglish:
-          'Humidity is above 85% in Mangaluru, Udupi, and Puttur, leading to high Powdery Mildew risk. Spray 1ml Contaf.',
-      summaryHindi:
-          'मंगलूरु, उडुपी, पुत्तूर क्षेत्रों में आर्द्रता 85% से अधिक होने के कारण रोग फैलने की संभावना है। 1ml कोंटाफ का छिड़काव करें।',
+      summaryKannada: 'ಮಂಗಳೂರು, ಉಡುಪಿ, ಪುತ್ತೂರು ಭಾಗಗಳಲ್ಲಿ ತೇವಾಂಶ 85% ಕ್ಕಿಂತ ಹೆಚ್ಚಿದ್ದು ಬೂದಿ ರೋಗ ಹರಡುವ ಸಾಧ್ಯತೆ ಇದೆ. ಕಾಂಟಾಫ್ 1ml ಸಿಂಪಡಿಸಿ.',
+      summaryEnglish: 'Humidity is above 85% in Mangaluru, Udupi, and Puttur, leading to high Powdery Mildew risk. Spray 1ml Contaf.',
+      summaryHindi: 'मंगलूरु, उडुपी, पुत्तूर क्षेत्रों में आर्द्रता 85% से अधिक होने के कारण रोग फैलने की संभावना है। 1ml कोंटाफ का छिड़काव करें।',
       dateKannada: 'ನಿನ್ನೆ',
       dateEnglish: 'Yesterday',
       dateHindi: 'कल',
@@ -57,20 +47,15 @@ class NewsService {
     ),
     const AgriNews(
       id: 'news_3',
-      titleKannada:
-          'ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಉತ್ತಮ ದರ್ಜೆಯ ಪಪ್ಪಾಯಿ ಹಣ್ಣಿಗೆ ಕೆ.ಜಿ ಗೆ ₹28 - ₹34 ಬೆಲೆ',
+      titleKannada: 'ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಉತ್ತಮ ದರ್ಜೆಯ ಪಪ್ಪಾಯಿ ಹಣ್ಣಿಗೆ ಕೆ.ಜಿ ಗೆ ₹28 - ₹34 ಬೆಲೆ',
       titleEnglish: 'Papaya Market Price Update: ₹28 - ₹34 per kg in APMC',
-      titleHindi:
-          'बाजार में अच्छी गुणवत्ता वाले पपीते की कीमत ₹28 - ₹34 प्रति किलोग्राम',
+      titleHindi: 'बाजार में अच्छी गुणवत्ता वाले पपीते की कीमत ₹28 - ₹34 प्रति किलोग्राम',
       categoryKannada: '💰 ಮಾರುಕಟ್ಟೆ ದರ',
       categoryEnglish: '💰 Market Price',
       categoryHindi: '💰 बाजार भाव',
-      summaryKannada:
-          'ಬೆಂಗಳೂರು, ಮೈಸೂರು ಮತ್ತು ಪುತ್ತೂರು APMC ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ರೆಡ್ ಲೇಡಿ (Red Lady) ತಳಿಯ ಪಪ್ಪಾಯಿಗೆ ಭಾರಿ ಬೇಡಿಕೆ ಬಂದಿದೆ.',
-      summaryEnglish:
-          'Red Lady papaya breed has high demand in Bengaluru, Mysuru, and Puttur APMC markets.',
-      summaryHindi:
-          'बेंगलुरु, मैसूर और पुत्तूर APMC बाजार में रेड लेडी (Red Lady) पपीते की किस्म की भारी मांग है।',
+      summaryKannada: 'ಬೆಂಗಳೂರು, ಮೈಸೂರು ಮತ್ತು ಪುತ್ತೂರು APMC ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ರೆಡ್ ಲೇಡಿ (Red Lady) ತಳಿಯ ಪಪ್ಪಾಯಿಗೆ ಭಾರಿ ಬೇಡಿಕೆ ಬಂದಿದೆ.',
+      summaryEnglish: 'Red Lady papaya breed has high demand in Bengaluru, Mysuru, and Puttur APMC markets.',
+      summaryHindi: 'बेंगलुरु, मैसूर और पुत्तूर APMC बाजार में रेड लेडी (Red Lady) पपीते की किस्म की भारी मांग है।',
       dateKannada: '22 ಜುಲೈ 2026',
       dateEnglish: '22 July 2026',
       dateHindi: '22 जुलाई 2026',
@@ -82,21 +67,15 @@ class NewsService {
     ),
     const AgriNews(
       id: 'news_4',
-      titleKannada:
-          'ಹೇನು ಮತ್ತು ಬಿಳಿ ನೊಣ ನಿಯಂತ್ರಣಕ್ಕೆ ಹಳದಿ ಅಂಟಿನ ಬಲೆಗಳನ್ನು ಬಳಸಿ',
-      titleEnglish:
-          'Use Yellow Sticky Traps to Stop Ringspot & Leaf Curl Vectors',
-      titleHindi:
-          'रिंगस्पॉट और पत्ता मरोड़ वाहकों को रोकने के लिए पीले कार्ड का उपयोग करें',
+      titleKannada: 'ಹೇನು ಮತ್ತು ಬಿಳಿ ನೊಣ ನಿಯಂತ್ರಣಕ್ಕೆ ಹಳದಿ ಅಂಟಿನ ಬಲೆಗಳನ್ನು ಬಳಸಿ',
+      titleEnglish: 'Use Yellow Sticky Traps to Stop Ringspot & Leaf Curl Vectors',
+      titleHindi: 'रिंगस्पॉट और पत्ता मरोड़ वाहकों को रोकने के लिए पीले कार्ड का उपयोग करें',
       categoryKannada: '💡 ಕೃಷಿ ಸಲಹೆ',
       categoryEnglish: '💡 Agri Advisory',
       categoryHindi: '💡 कृषि सलाह',
-      summaryKannada:
-          'ವೈರಸ್ ರೋಗಗಳು ಹರಡದಂತೆ ತಡೆಯಲು ಎಕರೆಗೆ 10 ಹಳದಿ ಅಂಟಿನ ಬಲೆಗಳನ್ನು ಕಟ್ಟುವುದರಿಂದ ಕೀಟನಾಶಕ ಸಿಂಪರಣೆ ವೆಚ್ಚ ಶೇ 40% ಕಡಿಮೆಯಾಗುತ್ತದೆ.',
-      summaryEnglish:
-          'Installing 10 yellow sticky traps per acre reduces pesticide spraying costs by 40% while stopping virus spread.',
-      summaryHindi:
-          'प्रति एकड़ 10 पीले चिपचिपे कार्ड लगाने से virus के फैलाव को रोकने के साथ-साथ कीटनाशक छिड़काव की लागत 40% तक कम हो जाती है।',
+      summaryKannada: 'ವೈರಸ್ ರೋಗಗಳು ಹರಡದಂತೆ ತಡೆಯಲು ಎಕರೆಗೆ 10 ಹಳದಿ ಅಂಟಿನ ಬಲೆಗಳನ್ನು ಕಟ್ಟುವುದರಿಂದ ಕೀಟನಾಶಕ ಸಿಂಪರಣೆ ವೆಚ್ಚ ಶೇ 40% ಕಡಿಮೆಯಾಗುತ್ತದೆ.',
+      summaryEnglish: 'Installing 10 yellow sticky traps per acre reduces pesticide spraying costs by 40% while stopping virus spread.',
+      summaryHindi: 'प्रति एकड़ 10 पीले चिपचिपे कार्ड लगाने से virus के फैलाव को रोकने के साथ-साथ कीटनाशक छिड़काव की लागत 40% तक कम हो जाती है।',
       dateKannada: '20 ಜುಲೈ 2026',
       dateEnglish: '20 July 2026',
       dateHindi: '20 जुलाई 2026',

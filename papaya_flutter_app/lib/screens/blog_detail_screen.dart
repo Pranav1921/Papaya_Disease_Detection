@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/agri_news.dart';
 import '../theme/app_theme.dart';
-import '../services/kannada_tts_service.dart';
 import '../utils/localized_text.dart';
+import '../services/kannada_tts_service.dart';
 
 class BlogDetailScreen extends StatefulWidget {
   final AgriNews news;
@@ -72,8 +72,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
 
   void _playTts() async {
     setState(() => _ttsState = TtsState.playing);
-    final textToSpeak =
-        widget.news.getTitle(widget.language) + ". " + _getFullBlogContent();
+    final textToSpeak = widget.news.getTitle(widget.language) + ". " + _getFullBlogContent();
     await KannadaTtsService.speakText(textToSpeak, widget.language);
     if (mounted) setState(() => _ttsState = TtsState.stopped);
   }
@@ -142,34 +141,19 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
           _buildTtsIconButton(
             icon: Icons.play_arrow,
             onPressed: _ttsState == TtsState.playing ? null : _playTts,
-            label: pickLocalized(
-              widget.language,
-              kn: 'ಪ್ಲೇ',
-              hi: 'Play',
-              en: 'Play',
-            ),
+            label: pickLocalized(widget.language, kn: 'ಪ್ಲೇ', hi: 'Play', en: 'Play'),
             isActive: _ttsState == TtsState.playing,
           ),
           _buildTtsIconButton(
             icon: Icons.pause,
             onPressed: _ttsState == TtsState.playing ? _pauseTts : null,
-            label: pickLocalized(
-              widget.language,
-              kn: 'ಪಾಸ್',
-              hi: 'Pause',
-              en: 'Pause',
-            ),
+            label: pickLocalized(widget.language, kn: 'ಪಾಸ್', hi: 'Pause', en: 'Pause'),
             isActive: _ttsState == TtsState.paused,
           ),
           _buildTtsIconButton(
             icon: Icons.stop,
             onPressed: _ttsState == TtsState.stopped ? null : _stopTts,
-            label: pickLocalized(
-              widget.language,
-              kn: 'ನಿಲ್ಲಿಸಿ',
-              hi: 'Stop',
-              en: 'Stop',
-            ),
+            label: pickLocalized(widget.language, kn: 'ನಿಲ್ಲಿಸಿ', hi: 'Stop', en: 'Stop'),
             isActive: false,
           ),
         ],
@@ -177,25 +161,14 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
     );
   }
 
-  Widget _buildTtsIconButton({
-    required IconData icon,
-    required VoidCallback? onPressed,
-    required String label,
-    required bool isActive,
-  }) {
+  Widget _buildTtsIconButton({required IconData icon, required VoidCallback? onPressed, required String label, required bool isActive}) {
     return Column(
       children: [
         IconButton(
-          icon: Icon(
-            icon,
-            color: isActive ? AppTheme.forestGreen : AppTheme.darkMoss,
-          ),
+          icon: Icon(icon, color: isActive ? AppTheme.forestGreen : AppTheme.darkMoss),
           onPressed: onPressed,
         ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-        ),
+        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
       ],
     );
   }

@@ -65,30 +65,15 @@ class AgriNews {
   }
 
   String getTitle(String lang) {
-    return pickLocalized(
-      lang,
-      kn: titleKannada,
-      en: titleEnglish,
-      hi: titleHindi,
-    );
+    return pickLocalized(lang, kn: titleKannada, en: titleEnglish, hi: titleHindi);
   }
 
   String getCategory(String lang) {
-    return pickLocalized(
-      lang,
-      kn: categoryKannada,
-      en: categoryEnglish,
-      hi: categoryHindi,
-    );
+    return pickLocalized(lang, kn: categoryKannada, en: categoryEnglish, hi: categoryHindi);
   }
 
   String getSummary(String lang) {
-    return pickLocalized(
-      lang,
-      kn: summaryKannada,
-      en: summaryEnglish,
-      hi: summaryHindi,
-    );
+    return pickLocalized(lang, kn: summaryKannada, en: summaryEnglish, hi: summaryHindi);
   }
 
   String getDate(String lang) {
@@ -96,11 +81,6 @@ class AgriNews {
   }
 
   String getSource(String lang) {
-    return pickLocalized(
-      lang,
-      kn: sourceKannada,
-      en: sourceEnglish,
-      hi: sourceHindi,
-    );
+    return pickLocalized(lang, kn: sourceKannada, en: sourceEnglish, hi: sourceHindi);
   }
 }
