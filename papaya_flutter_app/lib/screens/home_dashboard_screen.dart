@@ -66,7 +66,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -174,7 +173,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildHistoryCard(Map<String, dynamic> item, String lang) {
-
     // Severity mapping
     double severity = (item['severity_percent'] as num?)?.toDouble() ?? 0.0;
     Color severityColor = severity > 80 ? Colors.red : (severity > 50 ? Colors.orange : AppTheme.emeraldGreen);

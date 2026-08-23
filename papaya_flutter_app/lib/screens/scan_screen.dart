@@ -287,7 +287,6 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppTheme.darkMoss,
       appBar: AppBar(
@@ -302,7 +301,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         actions: [
           LanguageDropdown(
             value: _activeLanguage,
-            useShortMenuLabels: true,
+            menuLabelStyle: LanguageMenuLabelStyle.twoLetterCodes,
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             onChanged: (val) {
               if (val != null) {

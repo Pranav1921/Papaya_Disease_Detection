@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
+enum LanguageMenuLabelStyle { native, nativeWithEnglishGloss, twoLetterCodes }
+
 class LanguageDropdown extends StatelessWidget {
   final String value;
   final ValueChanged<String?> onChanged;
-  final List<DropdownMenuItem<String>>? items;
   final bool useShortLabels;
-  final bool useShortMenuLabels;
-  final bool useExtendedMenuLabels;
+  final LanguageMenuLabelStyle menuLabelStyle;
   final double iconSize;
   final TextStyle style;
 
@@ -15,10 +15,8 @@ class LanguageDropdown extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
-    this.items,
     this.useShortLabels = false,
-    this.useShortMenuLabels = false,
-    this.useExtendedMenuLabels = false,
+    this.menuLabelStyle = LanguageMenuLabelStyle.native,
     this.iconSize = 24,
     this.style = const TextStyle(
       color: Colors.white,
@@ -28,24 +26,27 @@ class LanguageDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuItems = items ??
-        (useShortMenuLabels
-            ? const [
-                DropdownMenuItem(value: 'kn', child: Text('KN')),
-                DropdownMenuItem(value: 'en', child: Text('EN')),
-                DropdownMenuItem(value: 'hi', child: Text('HI')),
-              ]
-            : useExtendedMenuLabels
-                ? const [
-                    DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ (Kannada)')),
-                    DropdownMenuItem(value: 'en', child: Text('English')),
-                    DropdownMenuItem(value: 'hi', child: Text('हिन्दी (Hindi)')),
-                  ]
-                : const [
-                    DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
-                    DropdownMenuItem(value: 'en', child: Text('English')),
-                    DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
-                  ]);
+    final List<DropdownMenuItem<String>> menuItems;
+    switch (menuLabelStyle) {
+      case LanguageMenuLabelStyle.twoLetterCodes:
+        menuItems = const [
+          DropdownMenuItem(value: 'kn', child: Text('KN')),
+          DropdownMenuItem(value: 'en', child: Text('EN')),
+          DropdownMenuItem(value: 'hi', child: Text('HI')),
+        ];
+      case LanguageMenuLabelStyle.nativeWithEnglishGloss:
+        menuItems = const [
+          DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ (Kannada)')),
+          DropdownMenuItem(value: 'en', child: Text('English')),
+          DropdownMenuItem(value: 'hi', child: Text('हिन्दी (Hindi)')),
+        ];
+      case LanguageMenuLabelStyle.native:
+        menuItems = const [
+          DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
+          DropdownMenuItem(value: 'en', child: Text('English')),
+          DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
+        ];
+    }
 
     return DropdownButton<String>(
       value: value,

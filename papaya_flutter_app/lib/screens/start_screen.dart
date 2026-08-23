@@ -108,7 +108,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           value: _selectedLanguage,
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                           useShortLabels: true,
-                          useExtendedMenuLabels: true,
+                          menuLabelStyle: LanguageMenuLabelStyle.nativeWithEnglishGloss,
                           iconSize: 18,
                           onChanged: (val) {
                             if (val != null) {
