@@ -34,6 +34,16 @@ python app/api_server.py
 ```
 *The server will run at `http://0.0.0.0:8001`*
 
+#### Backend environment variables
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | *(unset)* | Gemini / OpenRouter vision key. When unset, stages 1–2 fall back to the offline colour heuristic. Never commit this value. |
+| `ALLOWED_ORIGINS` | *(unset — CORS disabled)* | Comma-separated browser origins allowed to call the API, e.g. `https://myapp.example`. Use `*` only for a public, credential-free deployment. |
+| `API_ACCESS_KEY` | *(unset — no auth)* | When set, `/api/v1/predict` requires a matching `X-API-Key` request header. |
+| `MAX_UPLOAD_BYTES` | `10485760` | Rejects larger image uploads. |
+| `MAX_IMAGE_PIXELS` | `40000000` | Rejects images with more decoded pixels (decompression-bomb guard). |
+| `OPENWEATHER_API_KEY` | *(unset)* | Optional key for `src/weather.py` live weather risk. |
+
 ### 2. Mobile App (Flutter)
 **Prerequisites:** Flutter SDK and Android Studio installed.
 

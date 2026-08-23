@@ -3,6 +3,7 @@ import sys
 import json
 import math
 import random
+import secrets
 import warnings
 
 # Suppress Deprecation Warnings for cleaner terminal
@@ -10,12 +11,27 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Attempt to import FastAPI and dependencies
 try:
-    from fastapi import FastAPI, UploadFile, File, Form
+    from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Query, Header, Depends
     from fastapi.middleware.cors import CORSMiddleware
     import uvicorn
     HAS_FASTAPI = True
 except ImportError:
     HAS_FASTAPI = False
+
+# Maximum accepted upload size for images (bytes)
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", 10 * 1024 * 1024))
+# Maximum decoded pixel count, guards against decompression bombs
+MAX_IMAGE_PIXELS = int(os.getenv("MAX_IMAGE_PIXELS", 40_000_000))
+ALLOWED_UPLOAD_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp", "image/bmp"}
+
+
+def get_allowed_origins() -> list:
+    """Origins permitted by CORS. Defaults to none; set ALLOWED_ORIGINS to a
+    comma-separated list (or '*' for public read-only access)."""
+    raw = os.getenv("ALLOWED_ORIGINS", "").strip()
+    if not raw:
+        return []
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 # Attempt to import TensorFlow and Image dependencies
 HAS_TF = False
@@ -87,17 +103,17 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
         import urllib.request
         import base64
 
-        # Use the key from environment, or default to a placeholder
-        api_key = os.getenv("GEMINI_API_KEY", "YOUR_OPENROUTER_KEY_HERE")
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        if not api_key:
+            print("[AI Diagnostic] GEMINI_API_KEY is not set; skipping vision call.")
+            return ""
         base64_image = base64.b64encode(image_bytes).decode('utf-8')
 
         # Detect if it's OpenRouter (sk-or- or AQ. format) or direct Gemini
         is_openrouter = api_key.startswith("sk-or-") or api_key.startswith("AQ.")
 
-        # Diagnostics: Print API provider (but mask the key)
         provider = "OpenRouter" if is_openrouter else "Google Gemini"
-        key_preview = api_key[:8] + "..." if len(api_key) > 8 else "MISSING"
-        print(f"[AI Diagnostic] Using {provider} (Key: {key_preview})")
+        print(f"[AI Diagnostic] Using {provider}")
 
         if is_openrouter:
             url = "https://openrouter.ai/api/v1/chat/completions"
@@ -130,14 +146,14 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
                     result = json.loads(response.read().decode('utf-8'))
                     return result['choices'][0]['message']['content'].strip().upper()
             except urllib.error.HTTPError as e:
-                error_body = e.read().decode('utf-8')
-                print(f"[OpenRouter Error] {e.code}: {error_body}")
+                print(f"[OpenRouter Error] HTTP {e.code}")
                 return ""
         else:
             # Direct Google Gemini API endpoint
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
             headers = {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key
             }
             payload = {
                 "contents": [
@@ -556,13 +572,58 @@ if HAS_FASTAPI:
         version="1.0.0"
     )
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    async def read_upload_limited(upload: UploadFile) -> bytes:
+        """Reads an upload in chunks, rejecting anything above MAX_UPLOAD_BYTES."""
+        chunks = []
+        total = 0
+        while True:
+            chunk = await upload.read(1024 * 1024)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > MAX_UPLOAD_BYTES:
+                raise HTTPException(status_code=413, detail="Uploaded image is too large")
+            chunks.append(chunk)
+        if total == 0:
+            raise HTTPException(status_code=400, detail="Uploaded image is empty")
+        return b"".join(chunks)
+
+    def validate_image_bytes(image_bytes: bytes) -> None:
+        """Verifies the payload decodes as an image of a sane size."""
+        import io as _io
+        try:
+            from PIL import Image as PILImage
+        except ImportError:
+            return
+        try:
+            with PILImage.open(_io.BytesIO(image_bytes)) as probe:
+                width, height = probe.size
+                probe.verify()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Uploaded file is not a valid image")
+        if width * height > MAX_IMAGE_PIXELS:
+            raise HTTPException(status_code=413, detail="Image resolution is too large")
+
+    allowed_origins = get_allowed_origins()
+    if allowed_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=allowed_origins,
+            # Credentials are never needed: the API is anonymous and wildcard
+            # origins combined with credentials would expose it to any site.
+            allow_credentials=False,
+            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_headers=["Content-Type"],
+        )
+
+    def require_api_key(x_api_key: str = Header(None)):
+        """Optional shared-secret gate. Enabled only when API_ACCESS_KEY is set,
+        so unauthenticated deployments keep working unchanged."""
+        expected = os.getenv("API_ACCESS_KEY", "").strip()
+        if not expected:
+            return
+        if not x_api_key or not secrets.compare_digest(x_api_key, expected):
+            raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
     @app.get("/")
     def health_check():
@@ -579,14 +640,21 @@ if HAS_FASTAPI:
     async def predict_disease(
         file: UploadFile = File(None),
         disease_key: str = Form("powdery_mildew"),
-        force: bool = Form(False)
+        force: bool = Form(False),
+        _auth: None = Depends(require_api_key),
     ):
+        if disease_key not in severity_map:
+            raise HTTPException(status_code=422, detail="Unknown disease_key")
+
         predicted_class = disease_key
         confidence = 94.2
 
         if file is not None:
+            if file.content_type not in ALLOWED_UPLOAD_TYPES:
+                raise HTTPException(status_code=415, detail="Unsupported image type")
+            image_bytes = await read_upload_limited(file)
+            validate_image_bytes(image_bytes)
             try:
-                image_bytes = await file.read()
                 prediction = predict_image(image_bytes, force=force)
                 if prediction is not None:
                     predicted_class, confidence = prediction
@@ -657,7 +725,11 @@ if HAS_FASTAPI:
         }
 
     @app.get("/api/v1/shops")
-    def get_nearest_shops(user_lat: float = DEFAULT_LAT, user_lng: float = DEFAULT_LNG, radius_km: float = 100.0):
+    def get_nearest_shops(
+        user_lat: float = Query(DEFAULT_LAT, ge=-90.0, le=90.0),
+        user_lng: float = Query(DEFAULT_LNG, ge=-180.0, le=180.0),
+        radius_km: float = Query(100.0, gt=0.0, le=20000.0),
+    ):
         filtered = []
         for s in MASTER_SHOPS:
             dist = calculate_haversine(user_lat, user_lng, s["lat"], s["lng"])
@@ -684,9 +756,10 @@ else:
         def _set_headers(self, status=200):
             self.send_response(status)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', '*')
+            for origin in get_allowed_origins():
+                self.send_header('Access-Control-Allow-Origin', origin)
+                self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
             self.end_headers()
 
         def do_OPTIONS(self):
@@ -726,9 +799,13 @@ else:
                 self._set_headers(200)
                 query_params = parse_qs(parsed_path.query)
                 key = query_params.get("disease_key", ["powdery_mildew"])[0]
-                
+                if key not in severity_map:
+                    self._set_headers(422)
+                    self.wfile.write(json.dumps({"error": "Unknown disease_key"}).encode('utf-8'))
+                    return
+
                 # Mock response format to match FastAPI predict JSON structure
-                base_severity = severity_map.get(key, 50.0)
+                base_severity = severity_map[key]
                 severity = round(base_severity + random.uniform(-4, 4), 1) if key != "healthy" else 0.0
                 status = "Moderate" if severity > 10 else "Healthy"
                 

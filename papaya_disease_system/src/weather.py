@@ -1,15 +1,21 @@
 # src/weather.py
-import requests
+import os
 import random
+
+import requests
 
 def get_coastal_weather_risk(city="Mangaluru", api_key=None):
     """
     Evaluates fungal disease risk based on Coastal Karnataka weather conditions.
     """
+    if api_key is None:
+        api_key = os.getenv("OPENWEATHER_API_KEY")
+
     if api_key:
         try:
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={city},IN&appid={api_key}&units=metric"
-            res = requests.get(url, timeout=3).json()
+            url = "https://api.openweathermap.org/data/2.5/weather"
+            params = {"q": f"{city},IN", "appid": api_key, "units": "metric"}
+            res = requests.get(url, params=params, timeout=3).json()
             humidity = res['main']['humidity']
             temp = res['main']['temp']
             rain = 'rain' in res
