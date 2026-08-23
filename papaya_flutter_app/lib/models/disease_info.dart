@@ -1,4 +1,5 @@
 import 'medicine_item.dart';
+import '../utils/localized_text.dart';
 
 class DiseaseInfo {
   final String id;
@@ -65,50 +66,74 @@ class DiseaseInfo {
   }
 
   String getTitle(String lang) {
-    if (lang == 'kn') return titleKannada;
-    if (lang == 'hi') return titleHindi;
-    return titleEnglish;
+    return pickLocalized(
+      lang,
+      kn: titleKannada,
+      en: titleEnglish,
+      hi: titleHindi,
+    );
   }
 
   String getSeverityLevel(String lang) {
-    if (lang == 'kn') return severityLevelKannada;
-    if (lang == 'hi') return severityLevelHindi;
-    return severityLevelEnglish;
+    return pickLocalized(
+      lang,
+      kn: severityLevelKannada,
+      en: severityLevelEnglish,
+      hi: severityLevelHindi,
+    );
   }
 
   String getDescription(String lang) {
-    if (lang == 'kn') return descriptionKannada;
-    if (lang == 'hi') return descriptionHindi;
-    return descriptionEnglish;
+    return pickLocalized(
+      lang,
+      kn: descriptionKannada,
+      en: descriptionEnglish,
+      hi: descriptionHindi,
+    );
   }
 
   String getChemicalTreatment(String lang) {
-    if (lang == 'kn') return chemicalTreatmentKannada;
-    if (lang == 'hi') return chemicalTreatmentHindi;
-    return chemicalTreatmentEnglish;
+    return pickLocalized(
+      lang,
+      kn: chemicalTreatmentKannada,
+      en: chemicalTreatmentEnglish,
+      hi: chemicalTreatmentHindi,
+    );
   }
 
   String getOrganicTreatment(String lang) {
-    if (lang == 'kn') return organicTreatmentKannada;
-    if (lang == 'hi') return organicTreatmentHindi;
-    return organicTreatmentEnglish;
+    return pickLocalized(
+      lang,
+      kn: organicTreatmentKannada,
+      en: organicTreatmentEnglish,
+      hi: organicTreatmentHindi,
+    );
   }
 
   String getFertilizerSchedule(String lang) {
-    if (lang == 'kn') return fertilizerScheduleKannada;
-    if (lang == 'hi') return fertilizerScheduleHindi;
-    return fertilizerScheduleEnglish;
+    return pickLocalized(
+      lang,
+      kn: fertilizerScheduleKannada,
+      en: fertilizerScheduleEnglish,
+      hi: fertilizerScheduleHindi,
+    );
   }
 
   String getPreventiveCare(String lang) {
-    if (lang == 'kn') return preventiveCareKannada;
-    if (lang == 'hi') return preventiveCareHindi;
-    return preventiveCareEnglish;
+    return pickLocalized(
+      lang,
+      kn: preventiveCareKannada,
+      en: preventiveCareEnglish,
+      hi: preventiveCareHindi,
+    );
   }
 
   String getSafetyInterval(String lang) {
-    if (lang == 'kn') return safetyIntervalKannada;
-    if (lang == 'hi') return safetyIntervalHindi;
-    return safetyIntervalEnglish;
+    return pickLocalized(
+      lang,
+      kn: safetyIntervalKannada,
+      en: safetyIntervalEnglish,
+      hi: safetyIntervalHindi,
+    );
   }
 }

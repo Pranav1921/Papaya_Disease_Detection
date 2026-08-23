@@ -14,6 +14,7 @@ class ShopLocationService {
       nameHindi: 'रायता संपर्क केंद्र पुत्तूर (RSK - सरकारी)',
       shopType: '🏛️ ಸರ್ಕಾರಿ ಸಂಸ್ಥೆ (Govt RSK)',
       addressKannada: 'ಕೃಷಿ ಇಲಾಖೆ ಕಚೇರಿ ಹತ್ತಿರ, ಮುಖ್ಯ ರಸ್ತೆ, ಪುತ್ತೂರು',
+      addressEnglish: 'Near Agriculture Department Office, Main Road, Puttur',
       addressHindi: 'कृषि विभाग कार्यालय के पास, मुख्य सड़क, पुत्तूर',
       talukDistrict: 'ಪುತ್ತೂರು, ದಕ್ಷಿಣ ಕನ್ನಡ',
       latitude: 12.7695,
@@ -31,6 +32,7 @@ class ShopLocationService {
       nameHindi: 'श्री दुर्गा कृषि सेवा केंद्र',
       shopType: '🛒 ಅಧಿಕೃತ ಕೃಷಿ ಮಳಿಗೆ (Agri Store)',
       addressKannada: 'ಬಸ್ ಸ್ಟ್ಯಾಂಡ್ ಎದುರು, ದರ್ಬೆ, ಪುತ್ತೂರು',
+      addressEnglish: 'Opposite Bus Stand, Darbe, Puttur',
       addressHindi: 'बस स्टैंड के सामने, दर्बे, पुत्तूर',
       talukDistrict: 'ಪುತ್ತೂರು, ದಕ್ಷಿಣ ಕನ್ನಡ',
       latitude: 12.7620,
@@ -48,6 +50,7 @@ class ShopLocationService {
       nameHindi: 'रायता संपर्क केंद्र मंगलूरु (RSK)',
       shopType: '🏛️ ಸರ್ಕಾರಿ ಸಂಸ್ಥೆ (Govt RSK)',
       addressKannada: 'ಕೋಟೆಕಾರ್ ಗೋಳಿಪಡ್ಪು, ಮಂಗಳೂರು',
+      addressEnglish: 'Kotekar Golipadpu, Mangaluru',
       addressHindi: 'कोटेकार गोलीपडपु, मंगलूरु',
       talukDistrict: 'ಮಂಗಳೂರು, ದಕ್ಷಿಣ ಕನ್ನಡ',
       latitude: 12.9141,
@@ -65,6 +68,7 @@ class ShopLocationService {
       nameHindi: 'दक्षिण कन्नड़ कृषक संघ बंटवाल',
       shopType: '🤝 ಸಹಕಾರಿ ಸಂಘ (Co-Op Society)',
       addressKannada: 'ಬಿ.ಸಿ. ರೋಡ್ ಕ್ರಾಸ್, ಬಂಟ್ವಾಳ',
+      addressEnglish: 'B.C. Road Cross, Bantwal',
       addressHindi: 'बी.सी. रोड क्रॉस, बंटवाल',
       talukDistrict: 'ಬಂಟ್ವಾಳ, ದಕ್ಷಿಣ ಕನ್ನಡ',
       latitude: 12.8943,
@@ -82,6 +86,7 @@ class ShopLocationService {
       nameHindi: 'उडुपी कृषक बाजार और औषधि केंद्र',
       shopType: '🛒 ಕೃಷಿ ಮಳಿಗೆ (Agri Store)',
       addressKannada: 'ಕವಿಮುದ್ದಣ ರಸ್ತೆ, ಉಡುಪಿ',
+      addressEnglish: 'Kavimuddana Road, Udupi',
       addressHindi: 'कविमुद्दण मार्ग, उडुपी',
       talukDistrict: 'ಉಡುಪಿ, ಕರ್ನಾಟಕ',
       latitude: 13.3409,
@@ -99,6 +104,7 @@ class ShopLocationService {
       nameHindi: 'रायता संपर्क केंद्र सुल्लिया',
       shopType: '🏛️ ಸರ್ಕಾರಿ ಸಂಸ್ಥೆ (Govt RSK)',
       addressKannada: 'ಮುಖ್ಯ ರಸ್ತೆ, ಸುಳ್ಯ',
+      addressEnglish: 'Main Road, Sullia',
       addressHindi: 'मुख्य सड़क, सुल्लिया',
       talukDistrict: 'ಸುಳ್ಯ, ದಕ್ಷಿಣ ಕನ್ನಡ',
       latitude: 12.5647,
@@ -116,6 +122,7 @@ class ShopLocationService {
       nameHindi: 'मैसूर एग्रो मार्ट',
       shopType: '🛒 ದೂರದ ಮಳಿಗೆ',
       addressKannada: 'ಕೆ.ಆರ್. ಸರ್ಕಲ್, ಮೈಸೂರು',
+      addressEnglish: 'K.R. Circle, Mysuru',
       addressHindi: 'के.आर. सर्कल, मैसूर',
       talukDistrict: 'ಮೈಸೂರು',
       latitude: 12.2958,
@@ -130,13 +137,17 @@ class ShopLocationService {
 
   /// Computes distance using Haversine formula in Kilometers
   static double calculateHaversineDistance(
-    double lat1, double lon1, double lat2, double lon2,
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
   ) {
     const double earthRadiusKm = 6371.0;
     double dLat = _degreesToRadians(lat2 - lat1);
     double dLon = _degreesToRadians(lon2 - lon1);
 
-    double a = sin(dLat / 2) * sin(dLat / 2) +
+    double a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(_degreesToRadians(lat1)) *
             cos(_degreesToRadians(lat2)) *
             sin(dLon / 2) *
@@ -156,13 +167,20 @@ class ShopLocationService {
     double userLng = defaultUserLng,
     double maxDistanceKm = 100.0,
   }) {
-    List<AgriShop> updatedList = _masterShopsList.map((shop) {
-      double dist = calculateHaversineDistance(userLat, userLng, shop.latitude, shop.longitude);
-      return shop.copyWithDistance(dist);
-    }).toList();
+    List<AgriShop> updatedList =
+        _masterShopsList.map((shop) {
+          double dist = calculateHaversineDistance(
+            userLat,
+            userLng,
+            shop.latitude,
+            shop.longitude,
+          );
+          return shop.copyWithDistance(dist);
+        }).toList();
 
     // Filter shops strictly less than maxDistanceKm (100km)
-    List<AgriShop> filtered = updatedList.where((shop) => shop.distanceKm <= maxDistanceKm).toList();
+    List<AgriShop> filtered =
+        updatedList.where((shop) => shop.distanceKm <= maxDistanceKm).toList();
 
     // Sort by distance ascending
     filtered.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));

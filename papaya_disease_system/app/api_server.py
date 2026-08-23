@@ -1,9 +1,15 @@
 import os
 import sys
 import json
-import math
-import random
 import warnings
+
+try:
+    from .api_helpers import shops_within_radius, severity_for, severity_map, status_for
+except ImportError:
+    try:
+        from app.api_helpers import shops_within_radius, severity_for, severity_map, status_for
+    except ImportError:
+        from api_helpers import shops_within_radius, severity_for, severity_map, status_for
 
 # Suppress Deprecation Warnings for cleaner terminal
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -21,14 +27,6 @@ except ImportError:
 HAS_TF = False
 model = None
 CLASSES = ['background', 'healthy', 'leaf_curl', 'powdery_mildew', 'ringspot_virus']
-severity_map = {
-    "powdery_mildew": 76.4,
-    "ringspot_virus": 88.5,
-    "leaf_curl": 65.0,
-    "healthy": 0.0,
-    "background": 0.0
-}
-
 try:
     import tensorflow as tf
     from PIL import Image
@@ -71,14 +69,6 @@ except Exception as e:
 # Reference user location (Puttur center)
 DEFAULT_LAT = 12.7684
 DEFAULT_LNG = 75.2027
-
-def calculate_haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    R = 6371.0
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c
 
 def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -> str:
     """Internal helper: sends an image + text prompt to Gemini.
@@ -295,11 +285,6 @@ def predict_image(image_bytes: bytes, force: bool = False):
         print("[Stage 2] Checking if leaf is specifically a papaya leaf...")
         papaya_status = is_papaya_leaf_ai(clean_image_bytes)
 
-        # === STAGE 3: Disease Classification (TF Model) ===
-        if not HAS_TF or model is None:
-            print("[Stage 3] TF model not loaded, cannot classify disease.")
-            return None
-
         # Process clean image for model
         img = Image.open(io.BytesIO(clean_image_bytes)).convert("RGB")
         img_resized = img.resize((224, 224))
@@ -335,11 +320,6 @@ def predict_image(image_bytes: bytes, force: bool = False):
                  if decoded[0][2] > 0.25:
                      print(f"[REJECTION] ImageNet detected '{top_label}' ({decoded[0][2]*100:.1f}%). Not a plant.")
                      return "__not_a_leaf__", 0.0
-
-        # === STAGE 3: Disease Classification (TF Model) ===
-        if not HAS_TF or model is None:
-            print("[Stage 3] TF model not loaded, cannot classify disease.")
-            return None
 
         # Predict probabilities
         predictions = model.predict(img_array)
@@ -637,17 +617,8 @@ if HAS_FASTAPI:
                 "rejection_reason": "unknown_class"
             }
 
-        base_severity = severity_map[predicted_class]
-        severity = round(base_severity + random.uniform(-4, 4), 1) if predicted_class != "healthy" else 0.0
-
-        if severity > 80:
-            status = "Critical"
-        elif severity > 50:
-            status = "Severe"
-        elif severity > 10:
-            status = "Moderate"
-        else:
-            status = "Healthy"
+        severity = severity_for(predicted_class)
+        status = status_for(severity)
 
         return {
             "disease_key": predicted_class,
@@ -658,14 +629,7 @@ if HAS_FASTAPI:
 
     @app.get("/api/v1/shops")
     def get_nearest_shops(user_lat: float = DEFAULT_LAT, user_lng: float = DEFAULT_LNG, radius_km: float = 100.0):
-        filtered = []
-        for s in MASTER_SHOPS:
-            dist = calculate_haversine(user_lat, user_lng, s["lat"], s["lng"])
-            if dist <= radius_km:
-                shop_item = dict(s)
-                shop_item["distance_km"] = round(dist, 2)
-                filtered.append(shop_item)
-        filtered.sort(key=lambda x: x["distance_km"])
+        filtered = shops_within_radius(MASTER_SHOPS, user_lat, user_lng, radius_km)
         return {"status": "success", "radius_km": radius_km, "total_shops": len(filtered), "shops": filtered}
 
     @app.get("/api/v1/news")
@@ -700,14 +664,7 @@ else:
                 self.wfile.write(json.dumps(data).encode('utf-8'))
             elif parsed_path.path == "/api/v1/shops":
                 self._set_headers(200)
-                filtered = []
-                for s in MASTER_SHOPS:
-                    dist = calculate_haversine(DEFAULT_LAT, DEFAULT_LNG, s["lat"], s["lng"])
-                    if dist <= 100.0:
-                        item = dict(s)
-                        item["distance_km"] = round(dist, 2)
-                        filtered.append(item)
-                filtered.sort(key=lambda x: x["distance_km"])
+                filtered = shops_within_radius(MASTER_SHOPS, DEFAULT_LAT, DEFAULT_LNG, 100.0)
                 self.wfile.write(json.dumps({"status": "success", "shops": filtered}).encode('utf-8'))
             elif parsed_path.path == "/api/v1/news":
                 self._set_headers(200)
@@ -728,9 +685,8 @@ else:
                 key = query_params.get("disease_key", ["powdery_mildew"])[0]
                 
                 # Mock response format to match FastAPI predict JSON structure
-                base_severity = severity_map.get(key, 50.0)
-                severity = round(base_severity + random.uniform(-4, 4), 1) if key != "healthy" else 0.0
-                status = "Moderate" if severity > 10 else "Healthy"
+                severity = severity_for(key) if key in severity_map else 50.0
+                status = status_for(severity)
                 
                 result = {
                     "disease_key": key,
