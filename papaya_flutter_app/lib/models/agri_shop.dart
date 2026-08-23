@@ -1,3 +1,5 @@
+import '../utils/localized_text.dart';
+
 class AgriShop {
   final String id;
   final String nameKannada;
@@ -5,6 +7,7 @@ class AgriShop {
   final String nameHindi;
   final String shopType; // RSK (Govt), Agri Center, Co-Op Society
   final String addressKannada;
+  final String addressEnglish;
   final String addressHindi;
   final String talukDistrict;
   final double latitude;
@@ -22,6 +25,7 @@ class AgriShop {
     required this.nameHindi,
     required this.shopType,
     required this.addressKannada,
+    required this.addressEnglish,
     required this.addressHindi,
     required this.talukDistrict,
     required this.latitude,
@@ -41,6 +45,7 @@ class AgriShop {
       nameHindi: nameHindi,
       shopType: shopType,
       addressKannada: addressKannada,
+      addressEnglish: addressEnglish,
       addressHindi: addressHindi,
       talukDistrict: talukDistrict,
       latitude: latitude,
@@ -54,14 +59,10 @@ class AgriShop {
   }
 
   String getName(String lang) {
-    if (lang == 'kn') return nameKannada;
-    if (lang == 'hi') return nameHindi;
-    return nameEnglish;
+    return pickLocalized(lang, kn: nameKannada, en: nameEnglish, hi: nameHindi);
   }
 
   String getAddress(String lang) {
-    if (lang == 'kn') return addressKannada;
-    if (lang == 'hi') return addressHindi;
-    return nameEnglish; // Fallback to name/address English
+    return pickLocalized(lang, kn: addressKannada, en: addressEnglish, hi: addressHindi);
   }
 }

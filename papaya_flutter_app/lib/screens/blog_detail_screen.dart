@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/agri_news.dart';
 import '../theme/app_theme.dart';
+import '../utils/localized_text.dart';
 import '../services/kannada_tts_service.dart';
 
 class BlogDetailScreen extends StatefulWidget {
@@ -140,19 +141,19 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
           _buildTtsIconButton(
             icon: Icons.play_arrow,
             onPressed: _ttsState == TtsState.playing ? null : _playTts,
-            label: isKn ? 'ಪ್ಲೇ' : 'Play',
+            label: pickLocalized(widget.language, kn: 'ಪ್ಲೇ', hi: 'Play', en: 'Play'),
             isActive: _ttsState == TtsState.playing,
           ),
           _buildTtsIconButton(
             icon: Icons.pause,
             onPressed: _ttsState == TtsState.playing ? _pauseTts : null,
-            label: isKn ? 'ಪಾಸ್' : 'Pause',
+            label: pickLocalized(widget.language, kn: 'ಪಾಸ್', hi: 'Pause', en: 'Pause'),
             isActive: _ttsState == TtsState.paused,
           ),
           _buildTtsIconButton(
             icon: Icons.stop,
             onPressed: _ttsState == TtsState.stopped ? null : _stopTts,
-            label: isKn ? 'ನಿಲ್ಲಿಸಿ' : 'Stop',
+            label: pickLocalized(widget.language, kn: 'ನಿಲ್ಲಿಸಿ', hi: 'Stop', en: 'Stop'),
             isActive: false,
           ),
         ],

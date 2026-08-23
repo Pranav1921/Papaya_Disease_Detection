@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import '../utils/localized_text.dart';
+import '../widgets/language_dropdown.dart';
 import '../services/ml_prediction_service.dart';
 import '../services/shop_location_service.dart';
 import '../services/pdf_prescription_service.dart';
@@ -100,22 +102,14 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
         title: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            isKn ? 'ಪಪ್ಪಾಯಿ ರೋಗ ವಿಶ್ಲೇಷಣೆ' : (isHi ? 'पपीता रोग विश्लेषण' : 'Papaya Disease Analysis'),
+            pickLocalized(_activeLanguage, kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ವಿಶ್ಲೇಷಣೆ', hi: 'पपीता रोग विश्लेषण', en: 'Papaya Disease Analysis'),
             style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.bold),
           ),
         ),
         actions: [
-          DropdownButton<String>(
+          LanguageDropdown(
             value: _activeLanguage,
-            dropdownColor: AppTheme.forestGreen,
-            icon: const Icon(Icons.language, color: Colors.white),
-            underline: const SizedBox(),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            items: const [
-              DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
-              DropdownMenuItem(value: 'en', child: Text('English')),
-              DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
-            ],
             onChanged: (val) {
               if (val != null) {
                 setState(() => _activeLanguage = val);
@@ -144,7 +138,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
                       onPressed: _exportPdfPrescription,
                       icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white),
                       label: Text(
-                        isKn ? '📄 PDF ವರದಿ ಪಡೆಯಿರಿ' : (isHi ? '📄 PDF रिपोर्ट प्राप्त करें' : '📄 Get PDF Report'),
+                        pickLocalized(_activeLanguage, kn: '📄 PDF ವರದಿ ಪಡೆಯಿರಿ', hi: '📄 PDF रिपोर्ट प्राप्त करें', en: '📄 Get PDF Report'),
                         style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(backgroundColor: AppTheme.emeraldGreen),
@@ -182,7 +176,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  isKn ? 'ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ' : (isHi ? 'ऑडियो गाइड' : 'Voice Guide'),
+                  pickLocalized(_activeLanguage, kn: 'ಧ್ವನಿ ಮಾರ್ಗದರ್ಶಿ', hi: 'ऑडियो गाइड', en: 'Voice Guide'),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -196,19 +190,19 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
               _buildTtsCircleButton(
                 icon: Icons.play_arrow,
                 onPressed: _ttsState == TtsState.playing ? null : _playTts,
-                label: isKn ? 'ಪ್ಲೇ' : 'PLAY',
+                label: pickLocalized(_activeLanguage, kn: 'ಪ್ಲೇ', hi: 'PLAY', en: 'PLAY'),
                 isActive: _ttsState == TtsState.playing,
               ),
               _buildTtsCircleButton(
                 icon: Icons.pause,
                 onPressed: _ttsState == TtsState.playing ? _pauseTts : null,
-                label: isKn ? 'ಪಾಸ್' : 'PAUSE',
+                label: pickLocalized(_activeLanguage, kn: 'ಪಾಸ್', hi: 'PAUSE', en: 'PAUSE'),
                 isActive: _ttsState == TtsState.paused,
               ),
               _buildTtsCircleButton(
                 icon: Icons.stop,
                 onPressed: _ttsState == TtsState.stopped ? null : _stopTts,
-                label: isKn ? 'ನಿಲ್ಲಿಸಿ' : 'STOP',
+                label: pickLocalized(_activeLanguage, kn: 'ನಿಲ್ಲಿಸಿ', hi: 'STOP', en: 'STOP'),
                 isActive: false,
               ),
             ],
@@ -265,8 +259,8 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
               decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(20)),
               child: Row(
                 children: [
-                  _buildToggleButton(isKn ? 'ಫೋಟೋ' : 'PHOTO', !_showHeatmap, () => setState(() => _showHeatmap = false)),
-                  _buildToggleButton(isKn ? 'HEATMAP' : 'HEATMAP', _showHeatmap, () => setState(() => _showHeatmap = true)),
+                  _buildToggleButton(pickLocalized(_activeLanguage, kn: 'ಫೋಟೋ', hi: 'PHOTO', en: 'PHOTO'), !_showHeatmap, () => setState(() => _showHeatmap = false)),
+                  _buildToggleButton(pickLocalized(_activeLanguage, kn: 'HEATMAP', hi: 'HEATMAP', en: 'HEATMAP'), _showHeatmap, () => setState(() => _showHeatmap = true)),
                 ],
               ),
             ),
@@ -296,7 +290,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
       children: [
         Icon(Icons.eco_rounded, size: 60, color: isHealthy ? AppTheme.emeraldGreen : AppTheme.leafGold),
         const SizedBox(height: 12),
-        Text(isKn ? '🖼️ ವಿಶ್ಲೇಷಣೆ' : '🖼️ Analysis', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+        Text(pickLocalized(_activeLanguage, kn: '🖼️ ವಿಶ್ಲೇಷಣೆ', hi: '🖼️ Analysis', en: '🖼️ Analysis'), style: const TextStyle(color: Colors.white60, fontSize: 13)),
       ],
     );
   }
@@ -304,9 +298,6 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
   Widget _buildSeverityPercentCard(DiseaseInfo disease, String lang) {
     bool isHealthy = disease.id == 'healthy';
     Color themeColor = isHealthy ? AppTheme.emeraldGreen : AppTheme.amberWarning;
-    bool isKn = lang == 'kn';
-    bool isHi = lang == 'hi';
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -319,7 +310,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isKn ? 'ಸಂಭವನೀಯ ರೋಗ:' : (isHi ? 'संभावित बीमारी:' : 'Possible Diagnosis:'),
+                        pickLocalized(lang, kn: 'ಸಂಭವನೀಯ ರೋಗ:', hi: 'संभावित बीमारी:', en: 'Possible Diagnosis:'),
                         style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -328,7 +319,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isKn ? 'ತೀವ್ರತೆ ಮಟ್ಟ: ${disease.getSeverityLevel(lang)}' : 'Severity: ${disease.getSeverityLevel(lang)}',
+                        pickLocalized(lang, kn: 'ತೀವ್ರತೆ ಮಟ್ಟ: ${disease.getSeverityLevel(lang)}', hi: 'Severity: ${disease.getSeverityLevel(lang)}', en: 'Severity: ${disease.getSeverityLevel(lang)}'),
                         style: TextStyle(color: themeColor, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                     ],
@@ -345,7 +336,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
             ),
             const Divider(height: 24),
             Text(
-              isKn ? 'ಸೂಚನೆ: ಈ ಕೆಳಗಿನ ಲಕ್ಷಣಗಳು ನಿಮ್ಮ ಬೆಳೆಯಲ್ಲಿ ಇರಬಹುದು:' : 'System Suggestion: These patterns might be present:',
+              pickLocalized(lang, kn: 'ಸೂಚನೆ: ಈ ಕೆಳಗಿನ ಲಕ್ಷಣಗಳು ನಿಮ್ಮ ಬೆಳೆಯಲ್ಲಿ ಇರಬಹುದು:', hi: 'System Suggestion: These patterns might be present:', en: 'System Suggestion: These patterns might be present:'),
               style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: AppTheme.textMuted),
             ),
             const SizedBox(height: 8),

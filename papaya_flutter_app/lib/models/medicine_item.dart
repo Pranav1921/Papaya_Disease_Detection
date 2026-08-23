@@ -1,3 +1,5 @@
+import '../utils/localized_text.dart';
+
 class MedicineItem {
   final String id;
   final String nameKannada;
@@ -42,32 +44,22 @@ class MedicineItem {
   });
 
   String getName(String lang) {
-    if (lang == 'kn') return nameKannada;
-    if (lang == 'hi') return nameHindi;
-    return nameEnglish;
+    return pickLocalized(lang, kn: nameKannada, en: nameEnglish, hi: nameHindi);
   }
 
   String getType(String lang) {
-    if (lang == 'kn') return typeKannada;
-    if (lang == 'hi') return typeHindi;
-    return typeEnglish;
+    return pickLocalized(lang, kn: typeKannada, en: typeEnglish, hi: typeHindi);
   }
 
   String getDosage(String lang) {
-    if (lang == 'kn') return dosageKannada;
-    if (lang == 'hi') return dosageHindi;
-    return dosageEnglish;
+    return pickLocalized(lang, kn: dosageKannada, en: dosageEnglish, hi: dosageHindi);
   }
 
   String getPackageSize(String lang) {
-    if (lang == 'kn') return packageSizeKannada;
-    if (lang == 'hi') return packageSizeHindi;
-    return packageSizeEnglish;
+    return pickLocalized(lang, kn: packageSizeKannada, en: packageSizeEnglish, hi: packageSizeHindi);
   }
 
   String getDescription(String lang) {
-    if (lang == 'kn') return descriptionKannada;
-    if (lang == 'hi') return descriptionHindi;
-    return descriptionEnglish;
+    return pickLocalized(lang, kn: descriptionKannada, en: descriptionEnglish, hi: descriptionHindi);
   }
 }

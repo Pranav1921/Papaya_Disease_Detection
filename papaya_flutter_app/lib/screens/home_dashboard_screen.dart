@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import '../utils/localized_text.dart';
+import '../widgets/language_dropdown.dart';
 import '../services/offline_cache_service.dart';
 import '../services/ml_prediction_service.dart';
 import 'scan_screen.dart';
@@ -64,27 +66,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isKn = _activeLanguage == 'kn';
-    bool isHi = _activeLanguage == 'hi';
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isKn ? 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ' : (isHi ? 'पपीता रोग पहचान' : 'Papaya Disease Detection'),
+          pickLocalized(_activeLanguage, kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ', hi: 'पपीता रोग पहचान', en: 'Papaya Disease Detection'),
           style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
-          DropdownButton<String>(
+          LanguageDropdown(
             value: _activeLanguage,
-            dropdownColor: AppTheme.forestGreen,
-            icon: const Icon(Icons.language, color: Colors.white),
-            underline: const SizedBox(),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            items: const [
-              DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ')),
-              DropdownMenuItem(value: 'en', child: Text('English')),
-              DropdownMenuItem(value: 'hi', child: Text('हिन्दी')),
-            ],
             onChanged: (val) {
               if (val != null) {
                 setState(() => _activeLanguage = val);
@@ -127,7 +117,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     const Icon(Icons.camera_alt_rounded, color: AppTheme.leafGold, size: 60),
                     const SizedBox(height: 10),
                     Text(
-                      isKn ? 'ಎಲೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ' : (isHi ? 'पत्ती स्कैन करें' : 'Scan Leaf'),
+                      pickLocalized(_activeLanguage, kn: 'ಎಲೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ', hi: 'पत्ती स्कैन करें', en: 'Scan Leaf'),
                       style: GoogleFonts.notoSansKannada(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -148,7 +138,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 const Icon(Icons.history_rounded, color: AppTheme.forestGreen),
                 const SizedBox(width: 8),
                 Text(
-                  isKn ? 'ಹಿಂದಿನ ತಪಾಸಣೆಗಳು' : (isHi ? 'पुराना इतिहास' : 'Recent History'),
+                  pickLocalized(_activeLanguage, kn: 'ಹಿಂದಿನ ತಪಾಸಣೆಗಳು', hi: 'पुराना इतिहास', en: 'Recent History'),
                   style: GoogleFonts.notoSansKannada(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -164,7 +154,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             child: _scanHistory.isEmpty
                 ? Center(
                     child: Text(
-                      isKn ? 'ಯಾವುದೇ ಇತಿಹಾಸವಿಲ್ಲ' : (isHi ? 'कोई इतिहास नहीं' : 'No history found'),
+                      pickLocalized(_activeLanguage, kn: 'ಯಾವುದೇ ಇತಿಹಾಸವಿಲ್ಲ', hi: 'कोई इतिहास नहीं', en: 'No history found'),
                       style: const TextStyle(color: AppTheme.textMuted),
                     ),
                   )
@@ -183,9 +173,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildHistoryCard(Map<String, dynamic> item, String lang) {
-    bool isKn = lang == 'kn';
-    bool isHi = lang == 'hi';
-
     // Severity mapping
     double severity = (item['severity_percent'] as num?)?.toDouble() ?? 0.0;
     Color severityColor = severity > 80 ? Colors.red : (severity > 50 ? Colors.orange : AppTheme.emeraldGreen);
@@ -219,7 +206,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           children: [
             Text(item['date'] ?? '', style: const TextStyle(fontSize: 11)),
             Text(
-              '${isKn ? 'ತೀವ್ರತೆ' : (isHi ? 'तीव्रता' : 'Severity')}: ${severity.toInt()}%',
+              '${pickLocalized(lang, kn: 'ತೀವ್ರತೆ', hi: 'तीव्रता', en: 'Severity')}: ${severity.toInt()}%',
               style: TextStyle(color: severityColor, fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ],

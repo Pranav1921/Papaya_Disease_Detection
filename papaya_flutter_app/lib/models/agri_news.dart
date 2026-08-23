@@ -1,3 +1,5 @@
+import '../utils/localized_text.dart';
+
 class AgriNews {
   final String id;
   final String titleKannada;
@@ -39,33 +41,46 @@ class AgriNews {
     this.isFeatured = false,
   });
 
+  factory AgriNews.fromJson(Map<String, dynamic> json) {
+    return AgriNews(
+      id: json['id'] ?? '',
+      titleKannada: json['titleKannada'] ?? '',
+      titleEnglish: json['titleEnglish'] ?? '',
+      titleHindi: json['titleHindi'] ?? '',
+      categoryKannada: json['categoryKannada'] ?? '',
+      categoryEnglish: json['categoryEnglish'] ?? '',
+      categoryHindi: json['categoryHindi'] ?? '',
+      summaryKannada: json['summaryKannada'] ?? '',
+      summaryEnglish: json['summaryEnglish'] ?? '',
+      summaryHindi: json['summaryHindi'] ?? '',
+      dateKannada: json['dateKannada'] ?? '',
+      dateEnglish: json['dateEnglish'] ?? '',
+      dateHindi: json['dateHindi'] ?? '',
+      iconEmoji: json['iconEmoji'] ?? '📰',
+      sourceKannada: json['sourceKannada'] ?? '',
+      sourceEnglish: json['sourceEnglish'] ?? '',
+      sourceHindi: json['sourceHindi'] ?? '',
+      isFeatured: json['isFeatured'] ?? false,
+    );
+  }
+
   String getTitle(String lang) {
-    if (lang == 'kn') return titleKannada;
-    if (lang == 'hi') return titleHindi;
-    return titleEnglish;
+    return pickLocalized(lang, kn: titleKannada, en: titleEnglish, hi: titleHindi);
   }
 
   String getCategory(String lang) {
-    if (lang == 'kn') return categoryKannada;
-    if (lang == 'hi') return categoryHindi;
-    return categoryEnglish;
+    return pickLocalized(lang, kn: categoryKannada, en: categoryEnglish, hi: categoryHindi);
   }
 
   String getSummary(String lang) {
-    if (lang == 'kn') return summaryKannada;
-    if (lang == 'hi') return summaryHindi;
-    return summaryEnglish;
+    return pickLocalized(lang, kn: summaryKannada, en: summaryEnglish, hi: summaryHindi);
   }
 
   String getDate(String lang) {
-    if (lang == 'kn') return dateKannada;
-    if (lang == 'hi') return dateHindi;
-    return dateEnglish;
+    return pickLocalized(lang, kn: dateKannada, en: dateEnglish, hi: dateHindi);
   }
 
   String getSource(String lang) {
-    if (lang == 'kn') return sourceKannada;
-    if (lang == 'hi') return sourceHindi;
-    return sourceEnglish;
+    return pickLocalized(lang, kn: sourceKannada, en: sourceEnglish, hi: sourceHindi);
   }
 }

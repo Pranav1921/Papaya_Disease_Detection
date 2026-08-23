@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../theme/app_theme.dart';
+import '../utils/localized_text.dart';
+import '../widgets/language_dropdown.dart';
 import 'home_dashboard_screen.dart';
 
 class StartScreen extends StatefulWidget {
@@ -102,31 +104,12 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.white24),
                         ),
-                        child: DropdownButton<String>(
+                        child: LanguageDropdown(
                           value: _selectedLanguage,
-                          dropdownColor: AppTheme.forestGreen,
-                          icon: const Icon(Icons.language, color: Colors.white, size: 18),
-                          underline: const SizedBox(),
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                          items: const [
-                            DropdownMenuItem(value: 'kn', child: Text('ಕನ್ನಡ (Kannada)')),
-                            DropdownMenuItem(value: 'en', child: Text('English')),
-                            DropdownMenuItem(value: 'hi', child: Text('हिन्दी (Hindi)')),
-                          ],
-                          selectedItemBuilder: (BuildContext context) {
-                            return [
-                              'KN',
-                              'EN',
-                              'HI',
-                            ].map<Widget>((String item) {
-                              return Center(
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            }).toList();
-                          },
+                          useShortLabels: true,
+                          menuLabelStyle: LanguageMenuLabelStyle.nativeWithEnglishGloss,
+                          iconSize: 18,
                           onChanged: (val) {
                             if (val != null) {
                               setState(() => _selectedLanguage = val);
@@ -148,11 +131,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                       const SizedBox(height: 60),
                       // App Title
                       Text(
-                        _selectedLanguage == 'kn'
-                            ? 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ'
-                            : (_selectedLanguage == 'hi'
-                                ? 'पपीता रोग पहचान'
-                                : 'Papaya Disease Detection'),
+                        pickLocalized(_selectedLanguage, kn: 'ಪಪ್ಪಾಯಿ ರೋಗ ಪತ್ತೆ', hi: 'पपीता रोग पहचान', en: 'Papaya Disease Detection'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.notoSansKannada(
                           fontSize: 30,
@@ -178,11 +157,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           repeatForever: true,
                           animatedTexts: [
                             FadeAnimatedText(
-                              _selectedLanguage == 'kn'
-                                  ? '📸 ಎಲೆ ಫೋಟೋ ಹಾಕಿ ರೋಗ ಪತ್ತೆ ಮಾಡಿ'
-                                  : (_selectedLanguage == 'hi'
-                                      ? '📸 पत्ती की फोटो डालकर बीमारी का पता लगाएं'
-                                      : '📸 Scan leaf to detect disease'),
+                              pickLocalized(_selectedLanguage, kn: '📸 ಎಲೆ ಫೋಟೋ ಹಾಕಿ ರೋಗ ಪತ್ತೆ ಮಾಡಿ', hi: '📸 पत्ती की फोटो डालकर बीमारी का पता लगाएं', en: '📸 Scan leaf to detect disease'),
                               textStyle: GoogleFonts.notoSansKannada(
                                 fontSize: 15,
                                 color: AppTheme.leafGold,
@@ -191,11 +166,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                               duration: const Duration(seconds: 4),
                             ),
                             FadeAnimatedText(
-                              _selectedLanguage == 'kn'
-                                  ? '💰 ಔಷಧ ಮತ್ತು ಹತ್ತಿರದ ಅಂಗಡಿ ಮಾಹಿತಿ'
-                                  : (_selectedLanguage == 'hi'
-                                      ? '💰 दवाओं और नजदीकी दुकान की जानकारी'
-                                      : '💰 Get medicine & nearby shop info'),
+                              pickLocalized(_selectedLanguage, kn: '💰 ಔಷಧ ಮತ್ತು ಹತ್ತಿರದ ಅಂಗಡಿ ಮಾಹಿತಿ', hi: '💰 दवाओं और नजदीकी दुकान की जानकारी', en: '💰 Get medicine & nearby shop info'),
                               textStyle: GoogleFonts.notoSansKannada(
                                 fontSize: 15,
                                 color: Colors.white70,
@@ -255,9 +226,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                _selectedLanguage == 'kn'
-                                    ? '🚀 ಪ್ರಾರಂಭಿಸಿ'
-                                    : (_selectedLanguage == 'hi' ? '🚀 शुरू करें' : '🚀 Get Started'),
+                                pickLocalized(_selectedLanguage, kn: '🚀 ಪ್ರಾರಂಭಿಸಿ', hi: '🚀 शुरू करें', en: '🚀 Get Started'),
                                 style: GoogleFonts.notoSansKannada(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,

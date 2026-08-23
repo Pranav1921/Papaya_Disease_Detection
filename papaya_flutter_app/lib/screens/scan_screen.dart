@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import '../theme/app_theme.dart';
+import '../utils/localized_text.dart';
+import '../widgets/language_dropdown.dart';
 import '../services/ml_prediction_service.dart';
 import '../services/api_backend_service.dart';
 import 'diagnosis_result_screen.dart';
@@ -71,9 +73,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _activeLanguage == 'kn'
-                ? 'ℹ️ ಸಿಮ್ಯುಲೇಟರ್ ಮೋಡ್: ಮಾದರಿ ಎಲೆ ಬಳಸಲಾಗುತ್ತಿದೆ.'
-                : (_activeLanguage == 'hi' ? 'सिम्युलेटर मोड: नमूना पत्ती का उपयोग किया जा रहा है।' : 'Simulator Mode: Using selected sample leaf.'),
+            pickLocalized(_activeLanguage, kn: 'ℹ️ ಸಿಮ್ಯುಲೇಟರ್ ಮೋಡ್: ಮಾದರಿ ಎಲೆ ಬಳಸಲಾಗುತ್ತಿದೆ.', hi: 'सिम्युलेटर मोड: नमूना पत्ती का उपयोग किया जा रहा है।', en: 'Simulator Mode: Using selected sample leaf.'),
           ),
           backgroundColor: AppTheme.forestGreen,
         ),
@@ -129,11 +129,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _activeLanguage == 'kn'
-                ? '📸 ದಯವಿಟ್ಟು ಮೊದಲು ಪಪ್ಪಾಯಿ ಎಲೆಯ ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.'
-                : (_activeLanguage == 'hi'
-                    ? '📸 कृपया पहले पपीते की पत्ती की फोटो लें या अपलोड करें।'
-                    : '📸 Please take or upload a papaya leaf photo first.'),
+            pickLocalized(_activeLanguage, kn: '📸 ದಯವಿಟ್ಟು ಮೊದಲು ಪಪ್ಪಾಯಿ ಎಲೆಯ ಫೋಟೋ ತೆಗೆಯಿರಿ ಅಥವಾ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.', hi: '📸 कृपया पहले पपीते की पत्ती की फोटो लें या अपलोड करें।', en: '📸 Please take or upload a papaya leaf photo first.'),
           ),
           backgroundColor: const Color(0xFF1A5C3A),
           duration: const Duration(seconds: 3),
@@ -200,7 +196,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         backgroundColor: const Color(0xFF1A2332),
         icon: const Text('🤔', style: TextStyle(fontSize: 48)),
         title: Text(
-          _activeLanguage == 'kn' ? 'ಖಚಿತಪಡಿಸಿ' : (_activeLanguage == 'hi' ? 'पुष्टि करें' : 'Confirm Leaf'),
+          pickLocalized(_activeLanguage, kn: 'ಖಚಿತಪಡಿಸಿ', hi: 'पुष्टि करें', en: 'Confirm Leaf'),
           style: GoogleFonts.notoSansKannada(color: Colors.white, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -216,7 +212,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               setState(() => _imagePath = null);
             },
             child: Text(
-              _activeLanguage == 'kn' ? 'ಅಲ್ಲ (ನಿಲ್ಲಿಸಿ)' : (_activeLanguage == 'hi' ? 'नहीं (रोकें)' : 'No (Stop)'),
+              pickLocalized(_activeLanguage, kn: 'ಅಲ್ಲ (ನಿಲ್ಲಿಸಿ)', hi: 'नहीं (रोकें)', en: 'No (Stop)'),
               style: const TextStyle(color: Colors.redAccent),
             ),
           ),
@@ -227,7 +223,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.leafGold),
             child: Text(
-              _activeLanguage == 'kn' ? 'ಹೌದು (ವಿಶ್ಲೇಷಿಸಿ)' : (_activeLanguage == 'hi' ? 'हाँ (विश्लेषण करें)' : 'Yes (Analyze)'),
+              pickLocalized(_activeLanguage, kn: 'ಹೌದು (ವಿಶ್ಲೇಷಿಸಿ)', hi: 'हाँ (विश्लेषण करें)', en: 'Yes (Analyze)'),
               style: const TextStyle(color: AppTheme.darkMoss),
             ),
           ),
@@ -250,8 +246,8 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         ),
         title: Text(
           isNotLeaf
-              ? (_activeLanguage == 'kn' ? 'ಎಲೆ ಕಂಡುಬಂದಿಲ್ಲ' : (_activeLanguage == 'hi' ? 'पत्ती नहीं मिली' : 'No Leaf Detected'))
-              : (_activeLanguage == 'kn' ? 'ಪಪ್ಪಾಯಿ ಎಲೆ ಅಲ್ಲ' : (_activeLanguage == 'hi' ? 'पपीते की पत्ती नहीं' : 'Not a Papaya Leaf')),
+              ? (pickLocalized(_activeLanguage, kn: 'ಎಲೆ ಕಂಡುಬಂದಿಲ್ಲ', hi: 'पत्ती नहीं मिली', en: 'No Leaf Detected'))
+              : (pickLocalized(_activeLanguage, kn: 'ಪಪ್ಪಾಯಿ ಎಲೆ ಅಲ್ಲ', hi: 'पपीते की पत्ती नहीं', en: 'Not a Papaya Leaf')),
           style: GoogleFonts.notoSansKannada(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -274,7 +270,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
             onPressed: () => Navigator.pop(ctx),
             icon: const Icon(Icons.camera_alt),
             label: Text(
-              _activeLanguage == 'kn' ? 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ' : (_activeLanguage == 'hi' ? 'फिर कोशिश करें' : 'Try Again'),
+              pickLocalized(_activeLanguage, kn: 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', hi: 'फिर कोशिश करें', en: 'Try Again'),
               style: GoogleFonts.notoSansKannada(),
             ),
             style: ElevatedButton.styleFrom(
@@ -291,9 +287,6 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    bool isKn = _activeLanguage == 'kn';
-    bool isHi = _activeLanguage == 'hi';
-
     return Scaffold(
       backgroundColor: AppTheme.darkMoss,
       appBar: AppBar(
@@ -301,22 +294,15 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         title: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            isKn ? '📸 ಪಪ್ಪಾಯಿ ಎಲೆ ಸ್ಕ್ಯಾನರ್' : (isHi ? '📸 पपीता पत्ता स्कैनर' : '📸 Leaf Scanner'),
+            pickLocalized(_activeLanguage, kn: '📸 ಪಪ್ಪಾಯಿ ಎಲೆ ಸ್ಕ್ಯಾನರ್', hi: '📸 पपीता पत्ता स्कैनर', en: '📸 Leaf Scanner'),
             style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.bold),
           ),
         ),
         actions: [
-          DropdownButton<String>(
+          LanguageDropdown(
             value: _activeLanguage,
-            dropdownColor: AppTheme.forestGreen,
-            icon: const Icon(Icons.language, color: Colors.white),
-            underline: const SizedBox(),
+            menuLabelStyle: LanguageMenuLabelStyle.twoLetterCodes,
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            items: const [
-              DropdownMenuItem(value: 'kn', child: Text('KN')),
-              DropdownMenuItem(value: 'en', child: Text('EN')),
-              DropdownMenuItem(value: 'hi', child: Text('HI')),
-            ],
             onChanged: (val) {
               if (val != null) {
                 setState(() => _activeLanguage = val);
@@ -332,9 +318,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               children: [
                 const SizedBox(height: 10),
                 Text(
-                  isKn
-                      ? 'ಎಲೆಯನ್ನು ಚೌಕಟ್ಟಿನ ಮಧ್ಯದಲ್ಲಿರಿಸಿ'
-                      : (isHi ? 'पत्ती को फ्रेम के बीच में रखें' : 'Place leaf inside camera frame'),
+                  pickLocalized(_activeLanguage, kn: 'ಎಲೆಯನ್ನು ಚೌಕಟ್ಟಿನ ಮಧ್ಯದಲ್ಲಿರಿಸಿ', hi: 'पत्ती को फ्रेम के बीच में रखें', en: 'Place leaf inside camera frame'),
                   style: GoogleFonts.notoSansKannada(color: Colors.white70, fontSize: 14),
                 ),
                 const SizedBox(height: 16),
@@ -385,7 +369,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                                                 ),
                                                 const SizedBox(height: 12),
                                                 Text(
-                                                  isKn ? 'ಕ್ಯಾಮರಾ ಸಿದ್ಧವಾಗುತ್ತಿದೆ...' : (isHi ? 'कैमरा शुरू हो रहा है...' : 'Initializing camera...'),
+                                                  pickLocalized(_activeLanguage, kn: 'ಕ್ಯಾಮರಾ ಸಿದ್ಧವಾಗುತ್ತಿದೆ...', hi: 'कैमरा शुरू हो रहा है...', en: 'Initializing camera...'),
                                                   style: const TextStyle(color: Colors.white54, fontSize: 12),
                                                 ),
                                               ],
@@ -452,7 +436,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                           onPressed: _isAnalyzing ? null : () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo_library, color: Colors.white),
                           label: Text(
-                            isKn ? 'ಗ್ಯಾಲರಿ' : (isHi ? 'ಗ್ಯಾಲರಿ' : 'Gallery'),
+                            pickLocalized(_activeLanguage, kn: 'ಗ್ಯಾಲರಿ', hi: 'ಗ್ಯಾಲರಿ', en: 'Gallery'),
                             style: GoogleFonts.notoSansKannada(color: Colors.white),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -477,8 +461,8 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                             fit: BoxFit.scaleDown,
                             child: Text(
                               _imagePath == null
-                                  ? (isKn ? 'ಫೋಟೋ ತೆಗೆಯಿರಿ' : (isHi ? 'फोटो लें' : 'Take Photo'))
-                                  : (isKn ? 'ಪರೀಕ್ಷಿಸಿ' : (isHi ? 'जांचें' : 'Analyze')),
+                                  ? (pickLocalized(_activeLanguage, kn: 'ಫೋಟೋ ತೆಗೆಯಿರಿ', hi: 'फोटो लें', en: 'Take Photo'))
+                                  : (pickLocalized(_activeLanguage, kn: 'ಪರೀಕ್ಷಿಸಿ', hi: 'जांचें', en: 'Analyze')),
                               style: GoogleFonts.notoSansKannada(
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.darkMoss,
@@ -510,7 +494,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                       const CircularProgressIndicator(color: AppTheme.leafGold),
                       const SizedBox(height: 20),
                       Text(
-                        isKn ? '🔬 ವಿಶ್ಲೇಷಣೆ ನಡೆಯುತ್ತಿದೆ...' : (isHi ? '🔬 विश्लेषण हो रहा है...' : '🔬 Analyzing Leaf...'),
+                        pickLocalized(_activeLanguage, kn: '🔬 ವಿಶ್ಲೇಷಣೆ ನಡೆಯುತ್ತಿದೆ...', hi: '🔬 विश्लेषण हो रहा है...', en: '🔬 Analyzing Leaf...'),
                         style: GoogleFonts.notoSansKannada(
                           color: Colors.white,
                           fontSize: 18,

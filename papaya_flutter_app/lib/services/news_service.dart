@@ -100,28 +100,7 @@ class NewsService {
         final data = json.decode(utf8.decode(response.bodyBytes));
         if (data['status'] == 'success' && data['news'] != null) {
           final List<dynamic> jsonList = data['news'];
-          return jsonList.map((item) {
-            return AgriNews(
-              id: item['id'] ?? '',
-              titleKannada: item['titleKannada'] ?? '',
-              titleEnglish: item['titleEnglish'] ?? '',
-              titleHindi: item['titleHindi'] ?? '',
-              categoryKannada: item['categoryKannada'] ?? '',
-              categoryEnglish: item['categoryEnglish'] ?? '',
-              categoryHindi: item['categoryHindi'] ?? '',
-              summaryKannada: item['summaryKannada'] ?? '',
-              summaryEnglish: item['summaryEnglish'] ?? '',
-              summaryHindi: item['summaryHindi'] ?? '',
-              dateKannada: item['dateKannada'] ?? '',
-              dateEnglish: item['dateEnglish'] ?? '',
-              dateHindi: item['dateHindi'] ?? '',
-              iconEmoji: item['iconEmoji'] ?? '📰',
-              sourceKannada: item['sourceKannada'] ?? '',
-              sourceEnglish: item['sourceEnglish'] ?? '',
-              sourceHindi: item['sourceHindi'] ?? '',
-              isFeatured: item['isFeatured'] ?? false,
-            );
-          }).toList();
+          return jsonList.map((item) => AgriNews.fromJson(item)).toList();
         }
       }
     } catch (e) {

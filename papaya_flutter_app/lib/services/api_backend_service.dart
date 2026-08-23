@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import '../services/ml_prediction_service.dart';
+import '../utils/localized_text.dart';
 
 /// Thrown when the ML backend rejects the image (not a leaf / not a papaya leaf)
 class LeafRejectionException implements Exception {
@@ -18,10 +19,14 @@ class LeafRejectionException implements Exception {
     required this.messageHi,
   });
 
+  const LeafRejectionException.unexpectedResponse()
+      : reason = 'not_a_leaf',
+        messageEn = 'Unexpected response from the validation server.',
+        messageKn = 'ಸರ್ವರ್‌ನಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.',
+        messageHi = 'सर्वर से अप्रत्याशित प्रतिक्रिया मिली।';
+
   String getMessage(String lang) {
-    if (lang == 'kn') return messageKn;
-    if (lang == 'hi') return messageHi;
-    return messageEn;
+    return pickLocalized(lang, kn: messageKn, en: messageEn, hi: messageHi);
   }
 }
 
@@ -56,7 +61,7 @@ class ApiBackendService {
         request.fields['disease_key'] = diseaseKey;
         request.fields['force'] = force.toString();
         request.files.add(await http.MultipartFile.fromPath('file', imagePath));
-        
+
         // Use longer timeout (25s) because backend ML analysis (Gemini + ImageNet + TF)
         // can take time, especially on first run or slow networks.
         final streamedResponse = await request.send().timeout(const Duration(seconds: 25));
@@ -76,31 +81,17 @@ class ApiBackendService {
             );
           }
 
-          final returnedKey = data['disease_key'] ?? diseaseKey;
-          final severity = (data['severity'] as num?)?.toDouble() ?? 0.0;
-          final confidence = (data['confidence'] as num?)?.toDouble() ?? 90.0;
-          final status = data['status'] ?? 'Moderate';
-
-          final diseaseInfo = MLPredictionService.getDiseaseByKey(returnedKey);
-          return MLPredictionResult(
-            diseaseInfo: diseaseInfo,
-            severityPercentage: severity,
-            confidenceScore: confidence,
-            leafHealthStatus: status,
-            diagnosedAt: DateTime.now().toString().substring(0, 16),
+          return _buildPredictionResult(
+            data,
+            defaultDiseaseKey: diseaseKey,
+            imagePath: imagePath,
             heatmapCoordinates: [
               'X: 38%, Y: 44% [High Damage Spot]',
               'X: 62%, Y: 55% [Infection Boundary]'
             ],
-            imagePath: imagePath,
           );
           // Throw error for non-200 responses (e.g. server returned 500 or 404)
-          throw const LeafRejectionException(
-            reason: 'not_a_leaf',
-            messageEn: 'Unexpected response from the validation server.',
-            messageKn: 'ಸರ್ವರ್‌ನಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.',
-            messageHi: 'सर्वर से अप्रत्याशित प्रतिक्रिया मिली।',
-          );
+          throw const LeafRejectionException.unexpectedResponse();
         }
       } else {
         // Mock fallback if no image path
@@ -108,30 +99,14 @@ class ApiBackendService {
         final response = await http.post(uri).timeout(const Duration(seconds: 4));
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          final returnedKey = data['disease_key'] ?? diseaseKey;
-          final severity = (data['severity'] as num?)?.toDouble() ?? 0.0;
-          final confidence = (data['confidence'] as num?)?.toDouble() ?? 90.0;
-          final status = data['status'] ?? 'Moderate';
-
-          final diseaseInfo = MLPredictionService.getDiseaseByKey(returnedKey);
-          return MLPredictionResult(
-            diseaseInfo: diseaseInfo,
-            severityPercentage: severity,
-            confidenceScore: confidence,
-            leafHealthStatus: status,
-            diagnosedAt: DateTime.now().toString().substring(0, 16),
-            heatmapCoordinates: [
-              'X: 42%, Y: 35% [Infection Focus]'
-            ],
+          return _buildPredictionResult(
+            data,
+            defaultDiseaseKey: diseaseKey,
             imagePath: imagePath,
+            heatmapCoordinates: ['X: 42%, Y: 35% [Infection Focus]'],
           );
         } else {
-          throw const LeafRejectionException(
-            reason: 'not_a_leaf',
-            messageEn: 'Unexpected response from the validation server.',
-            messageKn: 'ಸರ್ವರ್‌ನಿಂದ ಅನಿರೀಕ್ಷಿತ ಪ್ರತಿಕ್ರಿಯೆ ಬಂದಿದೆ.',
-            messageHi: 'सर्वर से अप्रत्याशित प्रतिक्रिया मिली।',
-          );
+          throw const LeafRejectionException.unexpectedResponse();
         }
       }
       throw const LeafRejectionException(
@@ -149,6 +124,28 @@ class ApiBackendService {
         imagePath: imagePath,
       );
     }
+  }
+
+  static MLPredictionResult _buildPredictionResult(
+    Map<String, dynamic> data, {
+    required String defaultDiseaseKey,
+    required String? imagePath,
+    required List<String> heatmapCoordinates,
+  }) {
+    final returnedKey = data['disease_key'] as String? ?? defaultDiseaseKey;
+    final severity = (data['severity'] as num?)?.toDouble() ?? 0.0;
+    final confidence = (data['confidence'] as num?)?.toDouble() ?? 90.0;
+    final status = data['status'] as String? ?? 'Moderate';
+
+    return MLPredictionResult(
+      diseaseInfo: MLPredictionService.getDiseaseByKey(returnedKey),
+      severityPercentage: severity,
+      confidenceScore: confidence,
+      leafHealthStatus: status,
+      diagnosedAt: DateTime.now().toString().substring(0, 16),
+      heatmapCoordinates: heatmapCoordinates,
+      imagePath: imagePath,
+    );
   }
 
   /// Checks backend health status
