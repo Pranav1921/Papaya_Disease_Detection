@@ -345,7 +345,7 @@ class _DiagnosisResultScreenState extends State<DiagnosisResultScreen> with Sing
             ),
             const Divider(height: 24),
             Text(
-              isKn ? 'AI ಸೂಚನೆ: ಈ ಕೆಳಗಿನ ಲಕ್ಷಣಗಳು ನಿಮ್ಮ ಬೆಳೆಯಲ್ಲಿ ಇರಬಹುದು:' : 'AI Suggestion: These patterns might be present:',
+              isKn ? 'ಸೂಚನೆ: ಈ ಕೆಳಗಿನ ಲಕ್ಷಣಗಳು ನಿಮ್ಮ ಬೆಳೆಯಲ್ಲಿ ಇರಬಹುದು:' : 'System Suggestion: These patterns might be present:',
               style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: AppTheme.textMuted),
             ),
             const SizedBox(height: 8),

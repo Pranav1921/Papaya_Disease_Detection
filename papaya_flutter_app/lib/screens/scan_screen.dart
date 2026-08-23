@@ -200,7 +200,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
         backgroundColor: const Color(0xFF1A2332),
         icon: const Text('🤔', style: TextStyle(fontSize: 48)),
         title: Text(
-          _activeLanguage == 'kn' ? 'AI ಗೆ ಸ್ವಲ್ಪ ಗೊಂದಲವಿದೆ' : (_activeLanguage == 'hi' ? 'AI थोड़ा भ्रमित है' : 'AI is a bit unsure'),
+          _activeLanguage == 'kn' ? 'ಖಚಿತಪಡಿಸಿ' : (_activeLanguage == 'hi' ? 'पुष्टि करें' : 'Confirm Leaf'),
           style: GoogleFonts.notoSansKannada(color: Colors.white, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -510,7 +510,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                       const CircularProgressIndicator(color: AppTheme.leafGold),
                       const SizedBox(height: 20),
                       Text(
-                        isKn ? '🔬 AI ವಿಶ್ಲೇಷಣೆ ನಡೆಯುತ್ತಿದೆ...' : (isHi ? '🔬 AI विश्लेषण हो रहा है...' : '🔬 Analyzing Leaf...'),
+                        isKn ? '🔬 ವಿಶ್ಲೇಷಣೆ ನಡೆಯುತ್ತಿದೆ...' : (isHi ? '🔬 विश्लेषण हो रहा है...' : '🔬 Analyzing Leaf...'),
                         style: GoogleFonts.notoSansKannada(
                           color: Colors.white,
                           fontSize: 18,

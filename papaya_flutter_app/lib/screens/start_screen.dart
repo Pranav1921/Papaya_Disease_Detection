@@ -273,13 +273,6 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 6),
-                const Text(
-                  'v1.0 • AI-Powered Technology',
-                  style: TextStyle(color: Colors.white38, fontSize: 10),
-                ),
-                const SizedBox(height: 12),
               ],
             ),
           ),

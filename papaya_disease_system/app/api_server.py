@@ -3,6 +3,10 @@ import sys
 import json
 import math
 import random
+import warnings
+
+# Suppress Deprecation Warnings for cleaner terminal
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Attempt to import FastAPI and dependencies
 try:
@@ -16,7 +20,7 @@ except ImportError:
 # Attempt to import TensorFlow and Image dependencies
 HAS_TF = False
 model = None
-CLASSES = ['healthy', 'leaf_curl', 'powdery_mildew', 'ringspot_virus', 'background']
+CLASSES = ['background', 'healthy', 'leaf_curl', 'powdery_mildew', 'ringspot_virus']
 severity_map = {
     "powdery_mildew": 76.4,
     "ringspot_virus": 88.5,
@@ -30,6 +34,7 @@ try:
     from PIL import Image
     import io
     import numpy as np
+    import rembg
     from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
     HAS_TF = True
     
@@ -82,16 +87,27 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
         import urllib.request
         import base64
 
-        api_key = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
+        # Use the key from environment, or default to a placeholder
+        api_key = os.getenv("GEMINI_API_KEY", "YOUR_OPENROUTER_KEY_HERE")
         base64_image = base64.b64encode(image_bytes).decode('utf-8')
 
-        # Detect if it's OpenRouter (starts with sk-or-) or direct Gemini
-        if api_key.startswith("sk-or-"):
+        # Detect if it's OpenRouter (sk-or- or AQ. format) or direct Gemini
+        is_openrouter = api_key.startswith("sk-or-") or api_key.startswith("AQ.")
+
+        # Diagnostics: Print API provider (but mask the key)
+        provider = "OpenRouter" if is_openrouter else "Google Gemini"
+        key_preview = api_key[:8] + "..." if len(api_key) > 8 else "MISSING"
+        print(f"[AI Diagnostic] Using {provider} (Key: {key_preview})")
+
+        if is_openrouter:
             url = "https://openrouter.ai/api/v1/chat/completions"
             headers = {
                 "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://github.com/Pranav1921/Papaya_Disease_Detection",
+                "X-Title": "Papaya Disease Detection"
             }
+            # Try Pro model if Flash endpoints are not found
             payload = {
                 "model": "google/gemini-flash-1.5",
                 "messages": [
@@ -109,9 +125,14 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
                 "max_tokens": max_tokens
             }
             req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
-            with urllib.request.urlopen(req, timeout=8) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                return result['choices'][0]['message']['content'].strip().upper()
+            try:
+                with urllib.request.urlopen(req, timeout=10) as response:
+                    result = json.loads(response.read().decode('utf-8'))
+                    return result['choices'][0]['message']['content'].strip().upper()
+            except urllib.error.HTTPError as e:
+                error_body = e.read().decode('utf-8')
+                print(f"[OpenRouter Error] {e.code}: {error_body}")
+                return ""
         else:
             # Direct Google Gemini API endpoint
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
@@ -216,8 +237,38 @@ def is_papaya_leaf_ai(image_bytes: bytes) -> str:
 # def is_papaya_leaf(img_rgb_array): ... (removed)
 
 
+# Global Toggle for Background Removal (Set to False to disable heavy downloads)
+ENABLE_BG_REMOVAL = True
+
+def remove_background(image_bytes: bytes) -> bytes:
+    """Removes background and returns bytes of the leaf on a white background.
+    Uses the smaller 'u2netp' model (~4MB!) instead of the 1GB 'bria' model."""
+    if not ENABLE_BG_REMOVAL:
+        return image_bytes
+
+    try:
+        from rembg import remove, new_session
+        # Explicitly use the tiny model to avoid huge downloads
+        session = new_session("u2netp")
+
+        input_img = Image.open(io.BytesIO(image_bytes))
+        output_rgba = remove(input_img, session=session)
+
+        # Create a white background image
+        white_bg = Image.new("RGB", output_rgba.size, (255, 255, 255))
+        white_bg.paste(output_rgba, mask=output_rgba.split()[3])
+
+        # Convert back to bytes
+        img_byte_arr = io.BytesIO()
+        white_bg.save(img_byte_arr, format='JPEG')
+        return img_byte_arr.getvalue()
+    except Exception as e:
+        print(f"[BG Removal Skip] Skipping background removal: {e}")
+        return image_bytes # Fallback to original
+
 def predict_image(image_bytes: bytes, force: bool = False):
-    """3-Stage AI validation pipeline:
+    """4-Stage AI validation pipeline with BG removal:
+      Stage 0 — Pre-processing: Remove background for higher accuracy.
       Stage 1 — Gemini AI: Is there a leaf in the image?
       Stage 2 — Gemini AI: Is it specifically a papaya leaf?
       Stage 3 — TF Model:  What disease does the papaya leaf have?
@@ -227,9 +278,14 @@ def predict_image(image_bytes: bytes, force: bool = False):
         import io
         import numpy as np
 
+        # === STAGE 0: Background Removal ===
+        print("[Stage 0] Removing background for focus...")
+        clean_image_bytes = remove_background(image_bytes)
+
         # === STAGE 1: AI Leaf Detection (Gemini) ===
         print("[Stage 1] Checking if image contains a leaf...")
-        leaf_present = is_leaf_image_ai(image_bytes)
+        # Use clean image for detection
+        leaf_present = is_leaf_image_ai(clean_image_bytes)
         if not leaf_present:
             print("[Stage 1] REJECTED — no leaf detected.")
             return "__not_a_leaf__", 0.0
@@ -237,14 +293,15 @@ def predict_image(image_bytes: bytes, force: bool = False):
 
         # === STAGE 2: AI Papaya Leaf Verification (Gemini) ===
         print("[Stage 2] Checking if leaf is specifically a papaya leaf...")
-        papaya_status = is_papaya_leaf_ai(image_bytes)
+        papaya_status = is_papaya_leaf_ai(clean_image_bytes)
 
         # === STAGE 3: Disease Classification (TF Model) ===
         if not HAS_TF or model is None:
             print("[Stage 3] TF model not loaded, cannot classify disease.")
             return None
 
-        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        # Process clean image for model
+        img = Image.open(io.BytesIO(clean_image_bytes)).convert("RGB")
         img_resized = img.resize((224, 224))
         img_array = np.array(img_resized, dtype=np.float32)
         img_array = np.expand_dims(img_array, axis=0)
@@ -259,15 +316,16 @@ def predict_image(image_bytes: bytes, force: bool = False):
              print(f"[ImageNet Diagnostics] Top 3: {[(d[1], round(d[2], 3)) for d in decoded[:3]]}")
 
              # 1. Reject obvious non-plant items
-             plant_keywords = ['leaf', 'plant', 'tree', 'veggie', 'fruit', 'grass', 'flora', 'herb', 'corn', 'buckeye', 'cardoon']
+             plant_keywords = ['leaf', 'plant', 'tree', 'veggie', 'fruit', 'grass', 'flora', 'herb', 'corn', 'buckeye', 'cardoon', 'head_cabbage', 'bell_pepper', 'cucumber', 'zucchini']
              is_actually_a_plant = any(any(kw in d[1].lower() for kw in plant_keywords) for d in decoded)
 
              # 2. Specifically identify "imposters" (Mango, Banana, etc.)
              # ImageNet labels for common non-papaya plants
-             imposters = ["banana", "corn", "ear", "fig", "pineapple", "pomegranate", "lemon", "orange", "daisy", "bee_eater", "mango", "custard_apple", "guava", "jackfruit", "buckeye", "walking_stick"]
+             imposters = ["banana", "maize", "ear", "fig", "pineapple", "pomegranate", "lemon", "orange", "daisy", "bee_eater", "mango", "custard_apple", "guava", "jackfruit", "buckeye", "walking_stick"]
              for _, label, score in decoded:
-                 # Increased sensitivity: lowered from 0.30 to 0.18 for better rejection
-                 if any(imp in label.lower() for imp in imposters) and score > 0.18:
+                 # Check for whole words or specific substrings to avoid "corn" in "acorn"
+                 clean_label = label.lower().replace("_", " ")
+                 if any(imp in clean_label for imp in imposters) and score > 0.22:
                      print(f"[REJECTION] ImageNet detected imposter {label} with {score*100:.2f}% confidence.")
                      return "__not_papaya__", 0.0
 
@@ -299,9 +357,10 @@ def predict_image(image_bytes: bytes, force: bool = False):
             print("[Stage 4] FORCE MODE: Skipping shape validation as per user confirmation.")
             CONFIDENCE_THRESHOLD = 0.40 # Still need some baseline
         elif papaya_status == "YES":
-            # Shape is 100% Papaya. We can trust the disease percentage.
-            CONFIDENCE_THRESHOLD = 0.40
-            print(f"[Stage 4] SHAPE VERIFIED: Allowing low-confidence diagnosis ({CONFIDENCE_THRESHOLD*100}%)")
+            # Shape is 100% Papaya.
+            # User request: Keep the percentage for 60%
+            CONFIDENCE_THRESHOLD = 0.60
+            print(f"[Stage 4] SHAPE VERIFIED: Using user-requested threshold ({CONFIDENCE_THRESHOLD*100}%)")
 
         elif papaya_status == "NO":
             # Shape is definitely NOT Papaya.
@@ -315,12 +374,14 @@ def predict_image(image_bytes: bytes, force: bool = False):
             print(f"[Stage 4] SHAPE UNVERIFIED (API Offline): Using user-requested threshold ({CONFIDENCE_THRESHOLD*100}%)")
 
         if confidence < CONFIDENCE_THRESHOLD:
-            # If it's close to 60%, we mark it as "unsure" to ask the user
-            if not force and confidence > 0.40 and confidence < CONFIDENCE_THRESHOLD:
-                print(f"[UNSURE] {confidence*100:.2f}% is below {CONFIDENCE_THRESHOLD*100}% but above 40%. Asking user.")
+            # User confirmation logic:
+            # If it's between 30% and 60%, we mark it as "unsure" to ask the user.
+            # Lowered from 40% to 30% to catch severely curled/damaged leaves.
+            if not force and confidence > 0.30 and confidence < CONFIDENCE_THRESHOLD:
+                print(f"[UNSURE] {confidence*100:.2f}% is low but above 30%. Asking user.")
                 return "__unsure_papaya__", confidence
 
-            print(f"[REJECTION] Pattern Confidence {confidence*100:.2f}% is too low for an unverified shape.")
+            print(f"[REJECTION] Pattern Confidence {confidence*100:.2f}% is too low (below 30%).")
             return "__not_papaya__", confidence
 
         print(f"[SUCCESS] High confidence detection: {predicted_class}")
@@ -359,6 +420,20 @@ TREATMENT_DB = {
             {"name": "ಸಾವಯವ ಬೇೇವಿನ ಎಣ್ಣೆ (Neem Oil)", "price": 350.0, "dosage": "3 ml/L"}
         ],
         "total_package_cost": 1020.0
+    },
+    "leaf_curl": {
+        "disease_id": "leaf_curl",
+        "title_kannada": "ಎಲೆ ಮುದುರು ರೋಗ (Leaf Curl Virus)",
+        "title_english": "Papaya Leaf Curl Virus",
+        "severity_level": "ಹೆಚ್ಚಿನ ಅಪಾಯ (High Severity)",
+        "severity_percentage": 82.0,
+        "confidence_score": 94.1,
+        "prescribed_medicines": [
+            {"name": "ಪ್ರೈಡ್ (Pride - Acetamiprid)", "price": 270.0, "dosage": "0.5 g/L"},
+            {"name": "ಕಾನ್ಫಿಡಾರ್ (Confidor)", "price": 390.0, "dosage": "0.5 ml/L"},
+            {"name": "ಸಾವಯವ ಬೇೇವಿನ ಎಣ್ಣೆ (Neem Oil)", "price": 350.0, "dosage": "3 ml/L"}
+        ],
+        "total_package_cost": 1010.0
     }
 }
 

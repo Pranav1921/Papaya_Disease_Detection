@@ -22,6 +22,7 @@ dependencies:
   printing: ^5.11.1
   flutter_tts: ^3.8.5
   shared_preferences: ^2.2.2
+  path_provider: ^2.1.2
   http: ^1.2.0
   camera: ^0.10.5
   url_launcher: ^6.2.5
