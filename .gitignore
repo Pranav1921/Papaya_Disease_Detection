@@ -1,41 +1,67 @@
-# Virtual Environments
-.venv/
+# Virtual environments
 venv/
+.venv/
+*/venv/
+*/.venv/
+env/
 ENV/
+*.env
 
-# Python
+# Python cache & bytecode
 __pycache__/
-*.py[cod]
-*$py.class
+*/__pycache__/
+**/*.py[cod]
+**/*$py.class
+*.so
 .pytest_cache/
 
-# Flutter / Dart
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-build/
+# Flutter & Dart build artifacts
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+
+# Android build & local configs
 **/android/.gradle/
 **/android/.gradle_home/
-**/android/app/build/
 **/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/*.apk
+**/*.aab
 
-# Android
-.gradle/
-local.properties
-*.keystore
-*.jks
-*.apk
-*.aab
+# iOS & macOS build artifacts
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/.symlinks/
+**/*.xcworkspace/xcuserdata/
+**/*.xcodeproj/xcuserdata/
 
-# IDEs
-.vscode/
+# Logs
+*.log
+**/*.log
+backend_stderr.log
+backend_stdout.log
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
 .idea/
+**/.idea/
 *.iml
+**/*.iml
+.vscode/
 
-# Project specific rejections
-.artifacts/
-papaya_disease_system/data/raw/
-papaya_disease_system/data/processed/
+# LaTeX build outputs
+project_report/*.aux
+project_report/*.bbl
+project_report/*.blg
+project_report/*.log
+project_report/*.out
+project_report/*.toc
+project_report/*.synctex.gz
+project_report/*.fdb_latexmk
+project_report/*.fls

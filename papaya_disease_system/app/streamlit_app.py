@@ -1,5 +1,10 @@
 import os
 import sys
+
+# Set environment variables to prevent OpenBLAS crashes on Windows
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+
 import requests
 import streamlit as st
 import numpy as np
@@ -138,6 +143,25 @@ if uploaded_file is not None:
     # API endpoint configuration
     API_URL = "http://localhost:8001/api/v1/predict"
     heatmap_img = None
+
+    # Compute Grad-CAM heatmap if model is available
+    if get_gradcam_overlay is not None:
+        try:
+            local_model = load_trained_model()
+            if local_model is not None:
+                import cv2
+                img_resized = image.resize((224, 224))
+                img_arr = np.expand_dims(np.array(img_resized, dtype=np.float32), axis=0)
+                heatmap = get_gradcam_overlay(local_model, img_arr)
+                if heatmap is not None:
+                    heatmap_resized = cv2.resize(heatmap, (image.width, image.height))
+                    heatmap_colored = cv2.applyColorMap(heatmap_resized, cv2.COLORMAP_JET)
+                    heatmap_rgb = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
+                    img_np = np.array(image)
+                    overlay = cv2.addWeighted(img_np, 0.6, heatmap_rgb, 0.4, 0)
+                    heatmap_img = Image.fromarray(overlay)
+        except Exception:
+            heatmap_img = None
     
     with col2:
         st.subheader("🔬 ರೋಗ ಪತ್ತೆ ಫಲಿತಾಂಶ (Diagnosis)")
@@ -151,9 +175,9 @@ if uploaded_file is not None:
                 
                 # Call FastAPI backend
                 files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
-                response = requests.post(API_URL, files=files, timeout=12)
+                response = requests.post(API_URL, files=files, timeout=30)
                 
-                if response.statusCode == 200 or response.status_code == 200:
+                if response.status_code == 200:
                     res_data = response.json()
                     
                     # Check for staged AI rejections

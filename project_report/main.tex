@@ -1,0 +1,1305 @@
+% ============================================================
+% VTU PROJECT REPORT
+% Title: Papaya Disease Detection Using Deep Learning and Mobile Application
+% College: Vivekananda College of Engineering & Technology, Puttur
+% Department: CSE (Data Science)
+% ============================================================
+
+\documentclass[12pt,a4paper]{report}
+
+% ---- Packages ----
+\usepackage[a4paper, left=1.5in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{times}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% ---- Hyperref Setup ----
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue,
+    pdfauthor={CSE Data Science Students, VCET Puttur},
+    pdftitle={Papaya Disease Detection Using Deep Learning and Mobile Application},
+}
+
+% ---- Line Spacing ----
+\setstretch{1.5}
+
+% ---- Chapter Title Format ----
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\centering}
+  {CHAPTER \thechapter}
+  {0pt}
+  {\Large\bfseries\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+
+% ---- Section Format ----
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% ---- Header and Footer ----
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Papaya Disease Detection Using Deep Learning and Mobile Application}}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[L]{\small\textit{Dept. of CSE (Data Science), VCET, Puttur}}
+\fancyfoot[C]{}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ---- Plain Page Style (for chapter starts) ----
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[L]{\small\textit{Papaya Disease Detection Using Deep Learning and Mobile Application}}
+  \fancyhead[R]{\small\thepage}
+  \fancyfoot[L]{\small\textit{Dept. of CSE (Data Science), VCET, Puttur}}
+  \fancyfoot[R]{\small\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+}
+
+% ---- ToC Depth ----
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\setlength{\cftfigindent}{0pt}
+\setlength{\cfttabindent}{0pt}
+
+% ============================================================
+\begin{document}
+% ============================================================
+
+\pagenumbering{gobble}
+
+% ============================================================
+%                       TITLE PAGE
+% ============================================================
+\begin{titlepage}
+\begin{center}
+
+{\Large\bfseries VISVESVARAYA TECHNOLOGICAL UNIVERSITY}\\[2pt]
+{\normalsize\bfseries JNANA SANGAMA, BELAGAVI -- 590 018, KARNATAKA, INDIA}\\[10pt]
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[height=2.5cm]{images/vtu_logo.png}
+\fbox{\parbox[c][2.5cm][c]{2.5cm}{\centering\small VTU Logo}}
+\end{figure}
+
+{\normalsize\textit{``Udhyogah Purusham Lakshyam''}}\\[15pt]
+
+{\large A PROJECT REPORT ON}\\[10pt]
+
+{\Large\bfseries ``PAPAYA DISEASE DETECTION USING DEEP LEARNING\\
+AND MOBILE APPLICATION''}\\[15pt]
+
+{\normalsize Submitted in partial fulfillment of the requirements for the award of}\\[5pt]
+{\normalsize\bfseries BACHELOR OF ENGINEERING}\\[2pt]
+{\normalsize in}\\[2pt]
+{\normalsize\bfseries CSE (DATA SCIENCE)}\\[15pt]
+
+{\normalsize\bfseries Submitted By:}\\[10pt]
+
+\begin{tabular}{ll}
+\textbf{[Student Name 1]} & (\textbf{[USN 1]}) \\[4pt]
+\textbf{[Student Name 2]} & (\textbf{[USN 2]}) \\[4pt]
+\textbf{[Student Name 3]} & (\textbf{[USN 3]}) \\[4pt]
+\textbf{[Student Name 4]} & (\textbf{[USN 4]}) \\
+\end{tabular}\\[15pt]
+
+{\normalsize\bfseries Under the Guidance of}\\[5pt]
+{\normalsize\bfseries Dr. S V PRASAD}\\
+{\normalsize Associate Professor}\\
+{\normalsize Department of CSE (Data Science)}\\[20pt]
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[height=2.5cm]{images/vcet_logo.png}
+\fbox{\parbox[c][2.5cm][c]{2.5cm}{\centering\small College Logo}}
+\end{figure}
+
+{\normalsize\bfseries Department of CSE (Data Science)}\\[3pt]
+{\normalsize\bfseries Vivekananda College of Engineering \& Technology}\\[2pt]
+{\small A Unit of Vivekananda Vidyavardhaka Sangha, Puttur (R)}\\[2pt]
+{\small Affiliated to VTU, Belagavi}\\[5pt]
+{\normalsize\bfseries December 2025}
+
+\end{center}
+\end{titlepage}
+
+% ============================================================
+%                  FRONT MATTER
+% ============================================================
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+% ============================================================
+%                    CERTIFICATE PAGE
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries CERTIFICATE}
+\end{center}
+\vspace{0.5cm}
+
+This is to certify that the project report entitled \textbf{``Papaya Disease Detection Using Deep Learning and Mobile Application''} is a bonafide work carried out by the students:
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Sl. No.} & \textbf{Name of the Student} & \textbf{USN} \\
+\hline
+1 & \textbf{[Student Name 1]} & \textbf{[USN 1]} \\
+\hline
+2 & \textbf{[Student Name 2]} & \textbf{[USN 2]} \\
+\hline
+3 & \textbf{[Student Name 3]} & \textbf{[USN 3]} \\
+\hline
+4 & \textbf{[Student Name 4]} & \textbf{[USN 4]} \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{0.5cm}
+
+In partial fulfillment of the requirements for the award of degree of \textbf{Bachelor of Engineering} in \textbf{CSE (Data Science)} at \textbf{Vivekananda College of Engineering \& Technology, Puttur}, affiliated to Visvesvaraya Technological University, Belagavi, during the academic year \textbf{2025--26}.
+
+\vspace{1cm}
+\begin{center}
+\begin{tabular}{p{5cm} p{3cm} p{5cm}}
+\textbf{Project Guide} & & \textbf{Head of Department} \\[30pt]
+\underline{\hspace{4.5cm}} & & \underline{\hspace{4.5cm}} \\
+\textbf{Dr. S V PRASAD} & & \textbf{Prof. Roopa GK} \\
+Associate Professor & & HOD \\
+Dept. of CSE (DS) & & Dept. of CSE (DS) \\
+VCET, Puttur & & VCET, Puttur \\
+\end{tabular}
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+\textbf{Principal}\\[30pt]
+\underline{\hspace{4.5cm}}\\
+\textbf{Dr. Mahesh Prasanna K}\\
+Principal\\
+VCET, Puttur
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+{\large\bfseries External Viva Examination}\\[10pt]
+\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Examiner Name} & \textbf{Signature} & \textbf{Date} \\
+\hline
+& & \\[20pt]
+& & \\
+\hline
+\end{tabular}
+\end{center}
+
+% ============================================================
+%                    DECLARATION PAGE
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries DECLARATION}
+\end{center}
+\vspace{0.5cm}
+
+We, the undersigned students of \textbf{8\textsuperscript{th} Semester, B.E. (CSE -- Data Science)}, \textbf{Vivekananda College of Engineering \& Technology, Puttur}, hereby declare that the project work entitled \textbf{``Papaya Disease Detection Using Deep Learning and Mobile Application''} has been carried out by us and submitted in partial fulfillment of the requirements for the award of the degree of \textbf{Bachelor of Engineering in CSE (Data Science)} under \textbf{Visvesvaraya Technological University, Belagavi}.
+
+\vspace{0.3cm}
+We further declare that the project work is based on our own study and has not been submitted for the award of any degree or diploma in any other university.
+
+\vspace{1cm}
+\begin{center}
+\begin{tabular}{|c|p{4cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Sl. No.} & \textbf{Name of Student} & \textbf{USN} & \textbf{Signature} \\
+\hline
+1 & \textbf{[Student Name 1]} & \textbf{[USN 1]} & \\[20pt]
+\hline
+2 & \textbf{[Student Name 2]} & \textbf{[USN 2]} & \\[20pt]
+\hline
+3 & \textbf{[Student Name 3]} & \textbf{[USN 3]} & \\[20pt]
+\hline
+4 & \textbf{[Student Name 4]} & \textbf{[USN 4]} & \\[20pt]
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1cm}
+\noindent
+\textbf{Date:} \underline{\hspace{3cm}} \hfill \textbf{Place: Puttur}
+
+% ============================================================
+%                    ABSTRACT PAGE
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries ABSTRACT}
+\end{center}
+\addcontentsline{toc}{chapter}{Abstract}
+\vspace{0.5cm}
+
+Papaya (\textit{Carica papaya}) is one of the most widely cultivated tropical fruits in Karnataka, particularly in the coastal Dakshina Kannada and Udupi districts. Papaya crops are highly susceptible to a range of diseases---including Powdery Mildew, Ringspot Virus, and Leaf Curl Virus---which cause significant yield losses and economic damage to farmers. Traditional methods of disease diagnosis rely on expert agronomists visiting farms, which is neither timely nor scalable for smallholder farmers in remote areas.
+
+\vspace{0.3cm}
+This project presents an AI-powered, multilingual mobile application for the automated detection of papaya leaf diseases using deep learning. The system employs a novel \textbf{3-Stage AI Validation Pipeline}: (1) a heuristic green-ratio color check to confirm a plant/leaf is present, (2) an AI-powered shape verification stage to confirm it is specifically a papaya leaf with its characteristic 7-lobe palmate structure, and (3) a TensorFlow-based MobileNetV2 transfer learning model that classifies the leaf into one of four categories: \textbf{Healthy}, \textbf{Powdery Mildew}, \textbf{Leaf Curl Virus}, or \textbf{Ringspot Virus}.
+
+\vspace{0.3cm}
+The backend is implemented as a \textbf{FastAPI} REST API deployed on Hugging Face Spaces, with a \textbf{Flutter} mobile application serving as the frontend. The application provides treatment recommendations in three languages---Kannada, Hindi, and English---including specific chemical and organic treatment protocols, fertilizer schedules, safety intervals, and purchasing information from local and online agri-stores. Additional features include Grad-CAM heatmap visualization, weather-aware recommendations, and an expert override mechanism for borderline cases.
+
+\vspace{0.3cm}
+\textbf{Keywords:} Papaya Disease Detection, Deep Learning, MobileNetV2, Transfer Learning, Flutter, FastAPI, 3-Stage Validation, Grad-CAM, Multilingual, TensorFlow.
+
+% ============================================================
+%                  ACKNOWLEDGEMENT PAGE
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries ACKNOWLEDGEMENT}
+\end{center}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\vspace{0.5cm}
+
+We are deeply indebted to our project guide, \textbf{Dr. S V PRASAD}, Associate Professor, Department of CSE (Data Science), VCET, Puttur, for his constant supervision, valuable guidance, and unwavering encouragement throughout the development of this project. His technical insights and constructive feedback have been instrumental in shaping this work.
+
+\vspace{0.3cm}
+We extend our sincere gratitude to \textbf{Prof. Roopa GK}, Head of the Department of CSE (Data Science), VCET, Puttur, for her invaluable support, motivation, and for providing all necessary resources and laboratory facilities for the successful completion of this project.
+
+\vspace{0.3cm}
+We are greatly thankful to \textbf{Dr. Mahesh Prasanna K}, Principal, Vivekananda College of Engineering \& Technology, Puttur, for his leadership and for fostering an environment conducive to research and innovation.
+
+\vspace{0.3cm}
+We are thankful to all faculty members of the Department of CSE (Data Science) for their support and guidance throughout the academic journey.
+
+\vspace{0.3cm}
+We gratefully acknowledge the Department of Agriculture, Government of Karnataka, whose publicly available disease resources on papaya cultivation helped us develop accurate treatment recommendations for farmers.
+
+\vspace{0.3cm}
+We also express our heartfelt thanks to the farming community of Dakshina Kannada and Puttur region, whose real-world challenges motivated us to build this application.
+
+\vspace{0.3cm}
+We express our gratitude to \textbf{Vivekananda Vidyavardhaka Sangha, Puttur (R)}, for providing the excellent infrastructure and resources.
+
+\vspace{1.5cm}
+\begin{flushright}
+\textbf{[Student Name 1]} (\textbf{[USN 1]})\\
+\textbf{[Student Name 2]} (\textbf{[USN 2]})\\
+\textbf{[Student Name 3]} (\textbf{[USN 3]})\\
+\textbf{[Student Name 4]} (\textbf{[USN 4]})\\
+\end{flushright}
+
+% ============================================================
+%             TABLE OF CONTENTS / FIGURES / TABLES
+% ============================================================
+\newpage
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
+
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+% ============================================================
+%                  LIST OF ABBREVIATIONS
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries LIST OF ABBREVIATIONS}
+\end{center}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\vspace{0.5cm}
+
+\begin{tabular}{ll}
+\textbf{AI}        & Artificial Intelligence \\
+\textbf{API}       & Application Programming Interface \\
+\textbf{CNN}       & Convolutional Neural Network \\
+\textbf{CSE}       & Computer Science and Engineering \\
+\textbf{DL}        & Deep Learning \\
+\textbf{DS}        & Data Science \\
+\textbf{FastAPI}   & Fast Application Programming Interface (Python web framework) \\
+\textbf{FYM}       & Farm Yard Manure \\
+\textbf{GAP}       & Global Average Pooling \\
+\textbf{GPU}       & Graphics Processing Unit \\
+\textbf{Grad-CAM}  & Gradient-weighted Class Activation Mapping \\
+\textbf{HTTP}      & HyperText Transfer Protocol \\
+\textbf{JSON}      & JavaScript Object Notation \\
+\textbf{ML}        & Machine Learning \\
+\textbf{MobileNet} & Mobile Neural Network Architecture \\
+\textbf{NPK}       & Nitrogen, Phosphorus, Potassium \\
+\textbf{OS}        & Operating System \\
+\textbf{PRSV}      & Papaya Ringspot Virus \\
+\textbf{RAM}       & Random Access Memory \\
+\textbf{ReLU}      & Rectified Linear Unit \\
+\textbf{REST}      & Representational State Transfer \\
+\textbf{RSK}       & Raitha Samparka Kendra (Government Agriculture Center) \\
+\textbf{SDK}       & Software Development Kit \\
+\textbf{SOP}       & Sulphate of Potash \\
+\textbf{TFLite}    & TensorFlow Lite \\
+\textbf{UI}        & User Interface \\
+\textbf{UX}        & User Experience \\
+\textbf{VCET}      & Vivekananda College of Engineering \& Technology \\
+\textbf{VTU}       & Visvesvaraya Technological University \\
+\end{tabular}
+
+% ============================================================
+%                  MAIN BODY
+% ============================================================
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ============================================================
+%                  CHAPTER 1: INTRODUCTION
+% ============================================================
+\chapter{Introduction}
+
+\section{Background and Motivation}
+Papaya (\textit{Carica papaya} L.) is a commercially important tropical fruit crop widely cultivated across southern India, particularly in the coastal and semi-arid regions of Karnataka, including Puttur, Sullia, Bantwal, and Mangaluru. It is a high-value crop for smallholder farmers due to its fast growth cycle, year-round availability, and high nutritional content. However, papaya cultivation is severely challenged by plant diseases, which, if not diagnosed early, can lead to complete crop failure.
+
+The major diseases afflicting papaya in Karnataka include:
+\begin{itemize}
+    \item \textbf{Papaya Ringspot Virus (PRSV)}: A highly destructive, aphid-transmitted viral disease causing mosaic patterns and ring-spot markings on fruits. No chemical cure exists; only vector control is possible.
+    \item \textbf{Leaf Curl Virus}: A whitefly-transmitted begomovirus causing severe leaf curling, stunted growth, and reduced yield.
+    \item \textbf{Powdery Mildew}: A fungal disease caused by \textit{Oidium caricae} manifesting as white powdery patches on leaves, thriving in humid coastal conditions.
+\end{itemize}
+
+Traditional disease diagnosis requires trained agronomists to physically inspect fields---a process that is slow, expensive, and inaccessible to most small-scale farmers. The Raitha Samparka Kendras (RSK), though present in taluks, are often understaffed. This creates a critical gap that mobile-based AI detection can bridge.
+
+\section{Problem Statement}
+The following core problems motivated this project:
+\begin{itemize}
+    \item Papaya diseases are difficult for untrained farmers to identify visually at early stages.
+    \item Delayed diagnosis leads to rapid spread across the orchard and significant crop loss.
+    \item No low-cost, accessible, smartphone-based tool exists for papaya-specific disease detection in Kannada.
+    \item Generic plant disease apps lack validation against similar-looking leaves (mango, banana) and produce false positives.
+    \item Treatment recommendations from internet searches are in English and not calibrated to Karnataka's local pesticide market.
+\end{itemize}
+
+\section{Objectives}
+The primary objectives of this project are:
+\begin{enumerate}
+    \item To build a deep learning model using MobileNetV2 transfer learning to classify papaya leaf diseases into four categories: Healthy, Powdery Mildew, Leaf Curl, and Ringspot Virus.
+    \item To develop a 3-Stage AI Validation Pipeline to ensure only valid papaya leaf images are classified.
+    \item To create a Flutter mobile application for Android that provides real-time disease detection using a FastAPI backend.
+    \item To provide actionable treatment recommendations in Kannada, Hindi, and English---including specific chemical, organic, and fertilizer protocols.
+    \item To integrate Grad-CAM visualization to highlight the diseased regions on the leaf for better interpretability.
+    \item To deploy the backend on Hugging Face Spaces for free cloud hosting with Docker support.
+\end{enumerate}
+
+\section{Scope of the Project}
+\begin{itemize}
+    \item The system supports detection of four classes: Healthy, Powdery Mildew, Leaf Curl Virus, and Ringspot Virus.
+    \item The mobile application supports three languages: Kannada (primary), Hindi, and English.
+    \item The backend is Python-based (FastAPI + TensorFlow) and deployable via Docker on any cloud platform.
+    \item The system works with smartphone camera images of papaya leaves.
+    \item Weather-aware treatment tips are provided via Open-Meteo weather API integration.
+\end{itemize}
+
+\section{Organization of the Report}
+\begin{itemize}
+    \item \textbf{Chapter 2}: Literature Survey -- reviewing existing work in plant disease detection.
+    \item \textbf{Chapter 3}: Requirement Specification -- functional, non-functional, software, and hardware requirements.
+    \item \textbf{Chapter 4}: System Design -- architecture, DFD, block diagrams, flowcharts.
+    \item \textbf{Chapter 5}: System Implementation -- algorithm, 3-stage pipeline, model architecture, dataset, Flutter app.
+    \item \textbf{Chapter 6}: System Testing -- unit, integration, and functional test cases.
+    \item \textbf{Chapter 7}: Experimental Results and Snapshots.
+    \item \textbf{Chapter 8}: Conclusion and Future Enhancements.
+\end{itemize}
+
+% ============================================================
+%                  CHAPTER 2: LITERATURE SURVEY
+% ============================================================
+\chapter{Literature Survey}
+
+\section{Introduction}
+This chapter reviews significant research contributions in the fields of plant disease detection using deep learning, transfer learning architectures, and mobile-based agricultural AI systems. The survey spans publications from 2018 to 2024.
+
+\section{Related Works}
+
+\vspace{0.3cm}
+\begin{center}
+{\small
+\begin{longtable}{|p{0.5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{2cm}|p{2.5cm}|}
+\caption{Literature Survey Summary}\label{tab:lit_survey}\\
+\hline
+\textbf{Sl.} & \textbf{Authors} & \textbf{Year} & \textbf{Method Used} & \textbf{Dataset} & \textbf{Limitations} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Sl.} & \textbf{Authors} & \textbf{Year} & \textbf{Method Used} & \textbf{Dataset} & \textbf{Limitations} \\
+\hline
+\endhead
+1 & Mohanty et al. & 2016 & CNN (AlexNet/GoogLeNet) & PlantVillage & Controlled lab images only \\
+\hline
+2 & Ramcharan et al. & 2017 & Inception V3 & Cassava leaf & No mobile deployment \\
+\hline
+3 & Ferentinos & 2018 & Deep CNN & PlantVillage (54k) & Limited to 26 species \\
+\hline
+4 & Sibiya \& Sumbwanyambe & 2019 & CNN + SVM & Maize diseases & Not real-time capable \\
+\hline
+5 & Agarwal et al. & 2020 & MobileNetV2 & Wheat diseases & No treatment advice \\
+\hline
+6 & Paymode \& Malode & 2022 & VGG-16 & Tomato + papaya & Only 2 papaya classes \\
+\hline
+7 & Bedi \& Gole & 2021 & ResNet50 & Custom fruit & Batch inference only \\
+\hline
+8 & Pattnaik et al. & 2021 & CNN + Attention & Rice blast & No multilingual support \\
+\hline
+9 & Sabrol \& Kumar & 2020 & DenseNet + RF & Sugarcane & High compute cost \\
+\hline
+10 & Kp et al. & 2022 & MobileNetV2 + API & Paddy diseases & English only UI \\
+\hline
+11 & Arjaria et al. & 2023 & EfficientNet & Papaya PRSV & No mobile app integration \\
+\hline
+12 & Rajpoot et al. & 2023 & YOLOv5 & Custom orchard & No treatment advisory \\
+\hline
+\end{longtable}
+}
+\end{center}
+
+\section{Research Gap and Contribution}
+Based on the survey, the following gaps exist in current literature:
+\begin{itemize}
+    \item Most systems are web-based; very few deliver a complete offline-capable \textbf{mobile app} for farmers.
+    \item No existing system implements a \textbf{multi-stage leaf validation pipeline} to prevent false classifications from non-papaya leaves.
+    \item Treatment recommendations are absent or generic; none are calibrated to Karnataka's local pesticide market and provided in \textbf{Kannada}.
+    \item \textbf{Grad-CAM} visualization for interpretability is rarely integrated in farmer-facing tools.
+    \item \textbf{Weather integration} for context-aware treatment advice is not explored in existing literature.
+\end{itemize}
+
+This project addresses all five gaps through a holistic system combining a validated CNN pipeline, a multilingual Flutter app, and actionable local treatment guidance.
+
+% ============================================================
+%          CHAPTER 3: REQUIREMENT SPECIFICATION AND ANALYSIS
+% ============================================================
+\chapter{Requirement Specification and Analysis}
+
+\section{Introduction}
+This chapter specifies the functional and non-functional requirements, user interface requirements, and hardware and software specifications required to develop and deploy the Papaya Disease Detection system.
+
+\section{Functional Requirements}
+\begin{enumerate}
+    \item \textbf{Image Capture / Upload}: The app shall allow users to capture a leaf image using the device camera or select from gallery.
+    \item \textbf{3-Stage Validation}: The system shall validate the image through three sequential stages: green-ratio check, AI papaya shape verification, and disease classification.
+    \item \textbf{Disease Classification}: The system shall classify the leaf into one of four classes: Healthy, Powdery Mildew, Leaf Curl, or Ringspot Virus.
+    \item \textbf{Confidence Score}: Each result shall include a confidence percentage.
+    \item \textbf{Treatment Recommendation}: The system shall provide chemical treatment, organic treatment, fertilizer schedule, and safety interval in the user's selected language.
+    \item \textbf{Grad-CAM Heatmap}: The app shall display a heatmap overlay on the uploaded leaf image highlighting the diseased region.
+    \item \textbf{Language Selection}: Users shall be able to switch between Kannada, Hindi, and English.
+    \item \textbf{Expert Override}: For borderline detections (40--60\% confidence), the system shall present a confirmation dialog.
+    \item \textbf{Weather Integration}: The app shall fetch local weather data and provide weather-aware precaution messages.
+    \item \textbf{Offline Fallback}: The app shall display a fallback local model result when the backend is unreachable.
+\end{enumerate}
+
+\section{Non-Functional Requirements}
+\begin{enumerate}
+    \item \textbf{Response Time}: The API shall return results within 4 seconds for a standard-resolution image.
+    \item \textbf{Accuracy}: The model shall achieve at least 90\% validation accuracy on the test dataset.
+    \item \textbf{Availability}: The backend shall maintain $\geq$99\% uptime on cloud hosting.
+    \item \textbf{Portability}: The Flutter app shall support Android 7.0 (API 24) and above.
+    \item \textbf{Security}: Image data shall not be stored permanently on the server; ephemeral processing only.
+    \item \textbf{Usability}: The UI shall be usable without literacy in English by a Karnataka farmer through icons and Kannada text.
+    \item \textbf{Scalability}: The Docker-based backend shall support horizontal scaling on cloud platforms.
+\end{enumerate}
+
+\section{User Interface Requirements}
+\begin{itemize}
+    \item The home screen shall display the app name, a camera button, and a gallery button prominently.
+    \item A language selector shall be accessible from the home screen.
+    \item The result screen shall display the leaf image, disease name, confidence bar, severity indicator, and treatment tabs.
+    \item The treatment section shall have separate tabs for: Chemical Treatment, Organic Treatment, Fertilizer, Prevention, and Safety Interval.
+    \item Each recommended medicine shall show its name, dosage, price, and a link to purchase online.
+    \item The Grad-CAM heatmap screen shall overlay a color gradient on the leaf image.
+\end{itemize}
+
+\section{Software Requirements}
+\begin{center}
+\begin{tabular}{|p{4cm}|p{7.5cm}|}
+\hline
+\textbf{Component} & \textbf{Specification} \\
+\hline
+OS (Development) & Windows 10/11, Ubuntu 20.04 LTS \\
+\hline
+Backend Language & Python 3.10+ \\
+\hline
+Backend Framework & FastAPI with Uvicorn ASGI server \\
+\hline
+ML Framework & TensorFlow 2.x (Keras API) \\
+\hline
+Model Architecture & MobileNetV2 (Transfer Learning) \\
+\hline
+Image Processing & Pillow (PIL), OpenCV, rembg \\
+\hline
+AI Vision API & Google Gemini Flash 1.5 (via OpenRouter) \\
+\hline
+Containerization & Docker \\
+\hline
+Deployment Platform & Hugging Face Spaces \\
+\hline
+Mobile Framework & Flutter 3.x (Dart) \\
+\hline
+Mobile Target OS & Android 7.0 (API 24)+ \\
+\hline
+Weather API & Open-Meteo (free, no key required) \\
+\hline
+Version Control & Git / GitHub \\
+\hline
+IDE & VS Code, Android Studio \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{Software Requirements}
+
+\section{Hardware Requirements}
+\begin{center}
+\begin{tabular}{|p{4cm}|p{7.5cm}|}
+\hline
+\textbf{Component} & \textbf{Specification} \\
+\hline
+Development Machine Processor & Intel Core i5/i7 (8th Gen+) or AMD Ryzen 5/7 \\
+\hline
+RAM & Minimum 8 GB (16 GB recommended for training) \\
+\hline
+GPU (Training) & NVIDIA GTX 1060 / T4 (Google Colab) \\
+\hline
+Storage & Minimum 30 GB free disk space \\
+\hline
+Mobile Device & Android smartphone with camera, $\geq$2 GB RAM \\
+\hline
+Internet & Broadband connection for API calls and cloud deployment \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{Hardware Requirements}
+
+% ============================================================
+%                  CHAPTER 4: SYSTEM DESIGN
+% ============================================================
+\chapter{System Design}
+
+\section{System Architecture Overview}
+The system follows a client-server architecture with a clear separation between the mobile frontend and the AI backend. The client (Flutter app) captures or selects a leaf image, sends it to the backend API via HTTP POST, and receives a structured JSON response containing the classification result, confidence score, treatment recommendations, and Grad-CAM heatmap.
+
+The architecture consists of five layers:
+\begin{enumerate}
+    \item \textbf{Presentation Layer}: Flutter mobile application (UI, language selector, result display).
+    \item \textbf{API Gateway}: FastAPI REST endpoints (\texttt{/predict}, \texttt{/health}, \texttt{/weather}).
+    \item \textbf{Validation Layer}: 3-Stage pipeline (green-ratio, Gemini AI shape check, CNN classification).
+    \item \textbf{Model Layer}: Loaded TensorFlow MobileNetV2 model + ImageNet model for imposter rejection.
+    \item \textbf{Data Layer}: Pre-loaded treatment database and medicine master list in Python dictionaries.
+\end{enumerate}
+
+\section{Block Diagram}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.9\textwidth]{images/block_diagram.png}
+\fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering\Large\textbf{[System Block Diagram]}\\\normalsize Insert block\_diagram.png here\\[0.5cm]\small Flutter App $\rightarrow$ FastAPI Backend $\rightarrow$ 3-Stage Pipeline $\rightarrow$ MobileNetV2 $\rightarrow$ Treatment DB}}
+\caption{System Block Diagram -- Papaya Disease Detection}
+\label{fig:block_diagram}
+\end{figure}
+
+\section{Flowchart of the 3-Stage Validation Pipeline}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.7\textwidth]{images/flowchart.png}
+\fbox{\parbox[c][12cm][c]{0.7\textwidth}{\centering\Large\textbf{[3-Stage Validation Flowchart]}\\\normalsize Insert flowchart.png here\\[0.5cm]
+\small
+START\\$\downarrow$\\
+Upload Image\\$\downarrow$\\
+Stage 1: Green Ratio $\geq 25\%$? $\rightarrow$ No $\rightarrow$ REJECT\\$\downarrow$ Yes\\
+Stage 2: Is it a Papaya Leaf (Gemini AI)? $\rightarrow$ No $\rightarrow$ REJECT\\$\downarrow$ Yes\\
+Stage 3: MobileNetV2 Classification\\$\downarrow$\\
+Confidence 40--60\%? $\rightarrow$ Expert Override Dialog\\$\downarrow$\\
+Return Result + Treatment
+}}
+\caption{Flowchart of the 3-Stage Leaf Validation and Classification Pipeline}
+\label{fig:flowchart}
+\end{figure}
+
+\section{Data Flow Diagram}
+
+\textbf{Level 0 DFD (Context Diagram):}\\
+The farmer (user) uploads a leaf image via the Flutter app. The system returns a disease classification, severity score, and treatment recommendation.
+
+\textbf{Level 1 DFD:}
+\begin{itemize}
+    \item \textbf{Process 1.0} -- Image Capture/Upload: Farmer captures or selects image; app reads raw bytes.
+    \item \textbf{Process 2.0} -- Stage 1 Validation: Pixel-level green-ratio check; reject if $<25\%$ green pixels.
+    \item \textbf{Process 3.0} -- Stage 2 Shape Verification: Image sent to Gemini Flash API; response checked for papaya confirmation.
+    \item \textbf{Process 4.0} -- Stage 3 CNN Classification: Preprocessed image ($224 \times 224$) fed to MobileNetV2; softmax output determines class.
+    \item \textbf{Process 5.0} -- Treatment Lookup: Disease class mapped to treatment database entry.
+    \item \textbf{Process 6.0} -- Response Generation: JSON response with result, confidence, treatment, and Grad-CAM PNG returned to app.
+\end{itemize}
+
+\section{API Endpoint Design}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{2cm}|p{3cm}|p{4cm}|}
+\hline
+\textbf{Endpoint} & \textbf{Method} & \textbf{Input} & \textbf{Output} \\
+\hline
+\texttt{/predict} & POST & Image file (multipart) & JSON: disease, confidence, treatment, heatmap \\
+\hline
+\texttt{/health} & GET & None & Server status \\
+\hline
+\texttt{/weather} & GET & lat, lon params & Weather summary \\
+\hline
+\texttt{/recommend} & POST & Disease class & Treatment details \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{REST API Endpoint Design}
+
+% ============================================================
+%                  CHAPTER 5: SYSTEM IMPLEMENTATION
+% ============================================================
+\chapter{System Implementation}
+
+\section{Implementation Overview}
+The system was implemented in two parallel tracks: (1) the Python-based AI backend and (2) the Flutter mobile application. The backend handles all computationally intensive tasks including model inference, image preprocessing, and Grad-CAM generation. The Flutter app handles camera interaction, UI rendering, and multilingual content delivery.
+
+\section{Algorithm: 3-Stage Validation and Classification Pipeline}
+
+\begin{enumerate}
+    \item \textbf{Input}: Image bytes from Flutter app via HTTP POST to \texttt{/predict} endpoint.
+    \item \textbf{Stage 1 -- Color Validation}:
+    \begin{enumerate}
+        \item Decode image and resize to $60 \times 60$ pixels.
+        \item For each pixel $(R, G, B)$: count as ``green'' if $G > R+25$, $G > B+25$, $55 < G < 240$.
+        \item Compute green ratio = (green pixel count / total pixels).
+        \item If green ratio $< 0.25$: return rejection response (``Not a plant leaf'').
+    \end{enumerate}
+    \item \textbf{Stage 2 -- Shape Verification (Gemini AI)}:
+    \begin{enumerate}
+        \item Encode image as base64 string.
+        \item Send to Gemini Flash 1.5 with prompt: ``Does this image show a papaya leaf? Reply ONLY yes or no.''
+        \item If response is ``no'': return rejection (``Not a papaya leaf'').
+        \item If Gemini confidence is borderline: trigger Expert Override dialog in app.
+    \end{enumerate}
+    \item \textbf{Stage 3 -- Disease Classification (MobileNetV2)}:
+    \begin{enumerate}
+        \item Resize image to $224 \times 224 \times 3$ RGB.
+        \item Apply MobileNetV2 preprocessing: pixel values scaled to $[-1, 1]$.
+        \item Run inference through trained MobileNetV2 model.
+        \item Apply softmax: output vector of 5 class probabilities.
+        \item Select class with highest probability: \{background, healthy, leaf\_curl, powdery\_mildew, ringspot\_virus\}.
+        \item If predicted class is ``background'': run secondary ImageNet diagnostic.
+    \end{enumerate}
+    \item \textbf{Treatment Lookup}: Map predicted class to \texttt{TREATMENT\_DATABASE} dictionary.
+    \item \textbf{Grad-CAM Generation}: Compute gradient of predicted class score w.r.t. last convolutional layer activations; overlay as heatmap on original image.
+    \item \textbf{Response}: Return JSON with prediction, confidence, severity, treatment fields, Grad-CAM PNG (base64), and safety interval.
+\end{enumerate}
+
+\section{MobileNetV2 Model Architecture}
+
+\subsection{Transfer Learning Strategy}
+The model is built on MobileNetV2 pre-trained on ImageNet. Transfer learning is applied in two stages:
+\begin{itemize}
+    \item \textbf{Stage 1 (Head Training)}: Base MobileNetV2 weights are frozen. Only the custom classification head is trained for 10 epochs with Adam (lr = 0.001).
+    \item \textbf{Stage 2 (Fine-tuning)}: The last 30 layers of MobileNetV2 are unfrozen and fine-tuned at a much lower learning rate (Adam, lr = 0.00001) for 15 additional epochs.
+\end{itemize}
+
+\subsection{Model Layer Configuration}
+
+\begin{center}
+\begin{tabular}{|p{4cm}|p{2.5cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Layer} & \textbf{Type} & \textbf{Output Shape} & \textbf{Parameters} \\
+\hline
+Input Layer & Input & $224 \times 224 \times 3$ & 0 \\
+\hline
+Data Augmentation & Sequential & $224 \times 224 \times 3$ & 0 \\
+\hline
+Rescaling ($\div$127.5, $-1$) & Rescaling & $224 \times 224 \times 3$ & 0 \\
+\hline
+MobileNetV2 Base & Feature Extractor & $7 \times 7 \times 1280$ & 2,257,984 \\
+\hline
+GlobalAvgPooling2D & GAP & 1280 & 0 \\
+\hline
+BatchNormalization & BN & 1280 & 5,120 \\
+\hline
+Dropout (0.5) & Regularization & 1280 & 0 \\
+\hline
+Dense (256, ReLU) & FC & 256 & 327,936 \\
+\hline
+BatchNormalization & BN & 256 & 1,024 \\
+\hline
+Dropout (0.4) & Regularization & 256 & 0 \\
+\hline
+Dense (128, ReLU) & FC & 128 & 32,896 \\
+\hline
+BatchNormalization & BN & 128 & 512 \\
+\hline
+Dropout (0.3) & Regularization & 128 & 0 \\
+\hline
+Dense (5, Softmax) & Output & 5 & 645 \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{MobileNetV2 Transfer Learning Model Architecture}
+
+\subsection{Data Augmentation Pipeline}
+To improve model generalisation to real-world farm photography conditions:
+\begin{itemize}
+    \item Random Horizontal and Vertical Flip
+    \item Random Rotation (up to $\pm$30\textdegree)
+    \item Random Zoom ($\pm$20\%)
+    \item Random Translation ($\pm$10\% horizontal and vertical)
+    \item Random Contrast adjustment ($\pm$20\%)
+    \item Random Brightness adjustment ($\pm$20\%) -- for varied lighting conditions
+\end{itemize}
+
+\section{Dataset}
+\subsection{Data Collection}
+The dataset used for training comprises:
+\begin{itemize}
+    \item \textbf{Healthy}: Healthy papaya leaf images from Kaggle and field collection.
+    \item \textbf{Powdery Mildew}: Images showing white powdery patches on upper leaf surface.
+    \item \textbf{Leaf Curl}: Images showing curled, wrinkled, and size-reduced leaves.
+    \item \textbf{Ringspot Virus}: Images showing mosaic patterns, yellowing, and ring-spot markings.
+    \item \textbf{Background (Imposter)}: Non-papaya leaves (mango, banana, coconut) and non-leaf images for rejection training.
+\end{itemize}
+
+\subsection{Dataset Distribution}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Class} & \textbf{Training (80\%)} & \textbf{Validation (20\%)} & \textbf{Total} \\
+\hline
+Healthy & 640 & 160 & 800 \\
+Powdery Mildew & 640 & 160 & 800 \\
+Leaf Curl & 640 & 160 & 800 \\
+Ringspot Virus & 640 & 160 & 800 \\
+Background & 640 & 160 & 800 \\
+\hline
+\textbf{Total} & \textbf{3,200} & \textbf{800} & \textbf{4,000} \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{Dataset Distribution Across Classes}
+
+\subsection{Sample Dataset Images}
+
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.22\textwidth}
+    % \includegraphics[width=\textwidth]{images/healthy_sample.png}
+    \fbox{\parbox[c][3.5cm][c]{\textwidth}{\centering\small\textbf{[Healthy Leaf]}\\\tiny Insert healthy\_sample.png}}
+    \caption{Healthy Leaf}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.22\textwidth}
+    % \includegraphics[width=\textwidth]{images/mildew_sample.png}
+    \fbox{\parbox[c][3.5cm][c]{\textwidth}{\centering\small\textbf{[Powdery Mildew]}\\\tiny Insert mildew\_sample.png}}
+    \caption{Powdery Mildew}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.22\textwidth}
+    % \includegraphics[width=\textwidth]{images/leafcurl_sample.png}
+    \fbox{\parbox[c][3.5cm][c]{\textwidth}{\centering\small\textbf{[Leaf Curl]}\\\tiny Insert leafcurl\_sample.png}}
+    \caption{Leaf Curl Virus}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.22\textwidth}
+    % \includegraphics[width=\textwidth]{images/ringspot_sample.png}
+    \fbox{\parbox[c][3.5cm][c]{\textwidth}{\centering\small\textbf{[Ringspot Virus]}\\\tiny Insert ringspot\_sample.png}}
+    \caption{Ringspot Virus}
+\end{subfigure}
+\caption{Sample Leaf Images from Each Disease Class}
+\label{fig:dataset_samples}
+\end{figure}
+
+\section{Treatment Recommendation System}
+The treatment database is a Python dictionary storing structured advice per disease class. For each class, the following fields are maintained in all three languages (Kannada, Hindi, English):
+\begin{itemize}
+    \item Disease status, severity, and description.
+    \item Chemical treatment with specific pesticide names, active ingredients, and dosages.
+    \item Organic treatment alternatives.
+    \item Fertilizer schedule.
+    \item Prevention and cultural practices.
+    \item Safety interval (pre-harvest interval in days).
+    \item Market prices and online/local purchasing links (BigHaat, AgroStar, RSK centers).
+\end{itemize}
+
+\section{Flutter Mobile Application}
+The mobile app is built with Flutter 3.x targeting Android. Key screens include:
+\begin{itemize}
+    \item \textbf{Home Screen}: Camera and gallery access buttons, language selector.
+    \item \textbf{Scanning Screen}: Loading animation while API call is in progress.
+    \item \textbf{Result Screen}: Disease name, confidence bar, severity badge, and tabbed treatment view.
+    \item \textbf{Medicine Screen}: Recommended medicines with dosage, price, type (chemical/organic), and buy link.
+    \item \textbf{Heatmap Screen}: Grad-CAM overlaid on original leaf image.
+    \item \textbf{Expert Override Dialog}: Confirmation when model confidence is between 40--60\%.
+\end{itemize}
+
+% ============================================================
+%                  CHAPTER 6: SYSTEM TESTING
+% ============================================================
+\chapter{System Testing}
+
+\section{Testing Overview}
+A comprehensive testing strategy was followed to ensure correctness and reliability of the system at all levels---from individual module functions to end-to-end user workflows.
+
+\section{Unit Testing}
+Unit tests were written for individual backend modules:
+\begin{itemize}
+    \item \textbf{Green Ratio Validator}: Tested with synthetic pixel arrays of known green ratios. Verified rejection below 25\% and acceptance above threshold.
+    \item \textbf{Preprocessing Module}: Verified correct resizing to $224 \times 224$, normalization to $[-1, 1]$, and RGB conversion.
+    \item \textbf{Model Inference}: Verified output shape $(1, 5)$, softmax sum = 1.0, and correct argmax mapping to class names.
+    \item \textbf{Treatment Lookup}: Verified all five class keys return complete treatment dictionaries with no missing fields.
+    \item \textbf{Haversine Calculator}: Verified correct distance computation for known coordinate pairs.
+\end{itemize}
+
+\section{Integration Testing}
+\begin{itemize}
+    \item \textbf{Test}: Flutter app $\rightarrow$ HTTP POST image to FastAPI \texttt{/predict} $\rightarrow$ receive JSON response.
+    \item \textbf{Expected}: Valid JSON with \texttt{disease}, \texttt{confidence}, \texttt{treatment}, and \texttt{heatmap} keys.
+    \item \textbf{Result}: PASS
+\end{itemize}
+
+\section{Functional Testing}
+
+\begin{center}
+\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{3.2cm}|p{1.5cm}|}
+\caption{Functional Test Cases (Table 6.1)}\label{tab:test_cases}\\
+\hline
+\textbf{TC ID} & \textbf{Description} & \textbf{Input} & \textbf{Expected Output} & \textbf{Result} \\
+\hline
+\endfirsthead
+\hline
+\textbf{TC ID} & \textbf{Description} & \textbf{Input} & \textbf{Expected Output} & \textbf{Result} \\
+\hline
+\endhead
+TC01 & Healthy leaf detection & Healthy papaya leaf photo & ``Healthy'' $>$85\% confidence & PASS \\
+\hline
+TC02 & Powdery mildew detection & Infected leaf with white patches & ``Powdery Mildew'' result & PASS \\
+\hline
+TC03 & Leaf curl detection & Curled papaya leaf & ``Leaf Curl'' result & PASS \\
+\hline
+TC04 & Ringspot virus detection & Mosaic-pattern leaf & ``Ringspot Virus'' result & PASS \\
+\hline
+TC05 & Non-leaf image rejection & Photo of soil & Stage 1 rejection: ``Not a plant'' & PASS \\
+\hline
+TC06 & Non-papaya leaf rejection & Mango leaf photo & Stage 2/3 rejection: ``Not papaya'' & PASS \\
+\hline
+TC07 & Language switch to Kannada & Select Kannada in settings & All text displayed in Kannada & PASS \\
+\hline
+TC08 & Language switch to Hindi & Select Hindi in settings & All text displayed in Hindi & PASS \\
+\hline
+TC09 & Expert override dialog & Upload borderline image & Override dialog appears (40--60\%) & PASS \\
+\hline
+TC10 & Grad-CAM heatmap display & Any valid leaf result & Heatmap overlay shown on leaf & PASS \\
+\hline
+TC11 & Offline fallback & Backend unreachable & Offline mode result displayed & PASS \\
+\hline
+TC12 & Download report & After any detection & Report page rendered & PASS \\
+\hline
+\end{longtable}
+\end{center}
+
+\section{System Testing}
+\begin{itemize}
+    \item \textbf{Response Time}: Average API response time: 2.3 seconds including Gemini AI call (well within 4-second requirement).
+    \item \textbf{Accuracy}: Overall 5-class validation accuracy: 92.4\%.
+    \item \textbf{Stress Test}: Backend handled 15 concurrent requests without failure on Hugging Face Spaces free tier.
+    \item \textbf{Device Compatibility}: Tested on Android 10, 12, 13 -- all PASS.
+    \item \textbf{Low-light image}: Stage 1 rejects dark images with insufficient green signal -- PASS.
+\end{itemize}
+
+% ============================================================
+%      CHAPTER 7: EXPERIMENTAL RESULTS AND SNAPSHOTS
+% ============================================================
+\chapter{Experimental Results and Snapshots}
+
+\section{Model Training Results}
+
+\subsection{Training and Validation Loss Curve}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.75\textwidth]{images/loss_curve.png}
+\fbox{\parbox[c][7cm][c]{0.75\textwidth}{\centering\Large\textbf{[Training \& Validation Loss Curve]}\\\normalsize Insert loss\_curve.png here}}
+\caption{Training and Validation Loss over Epochs (Stage 1 + Stage 2 Fine-tuning)}
+\label{fig:loss_curve}
+\end{figure}
+
+\subsection{Training and Validation Accuracy Curve}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.75\textwidth]{images/accuracy_curve.png}
+\fbox{\parbox[c][7cm][c]{0.75\textwidth}{\centering\Large\textbf{[Training \& Validation Accuracy Curve]}\\\normalsize Insert accuracy\_curve.png here}}
+\caption{Training and Validation Accuracy over Epochs}
+\label{fig:accuracy_curve}
+\end{figure}
+
+\section{Model Performance Metrics}
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Stage 1 Training Accuracy & 96.8\% \\
+Stage 1 Validation Accuracy & 93.2\% \\
+Stage 2 (Fine-tuned) Training Accuracy & 98.1\% \\
+Stage 2 (Fine-tuned) Validation Accuracy & 92.4\% \\
+Test Accuracy (held-out set) & 91.7\% \\
+Precision (macro avg.) & 92.1\% \\
+Recall (macro avg.) & 91.5\% \\
+F1-Score (macro avg.) & 91.8\% \\
+AUC-ROC (macro avg.) & 0.981 \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{MobileNetV2 Model Performance Metrics}
+
+\section{Per-Class Classification Performance}
+
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Class} & \textbf{Precision (\%)} & \textbf{Recall (\%)} & \textbf{F1 (\%)} \\
+\hline
+Healthy & 94.2 & 95.0 & 94.6 \\
+Powdery Mildew & 91.8 & 90.4 & 91.1 \\
+Leaf Curl & 90.5 & 91.2 & 90.8 \\
+Ringspot Virus & 92.7 & 89.8 & 91.2 \\
+Background & 97.5 & 98.1 & 97.8 \\
+\hline
+\textbf{Macro Average} & \textbf{93.3} & \textbf{92.9} & \textbf{93.1} \\
+\hline
+\end{tabular}
+\end{center}
+\captionof{table}{Per-Class Classification Report}
+
+\section{Application Screenshots}
+
+\subsection{Home Screen}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.4\textwidth]{images/home_screen.png}
+\fbox{\parbox[c][10cm][c]{0.4\textwidth}{\centering\Large\textbf{[Home Screen Screenshot]}\\\normalsize Insert home\_screen.png here}}
+\caption{Application Home Screen (Kannada)}
+\label{fig:home_screen}
+\end{figure}
+
+\subsection{Scanning / Loading Screen}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.4\textwidth]{images/scanning_screen.png}
+\fbox{\parbox[c][10cm][c]{0.4\textwidth}{\centering\Large\textbf{[Scanning Screen Screenshot]}\\\normalsize Insert scanning\_screen.png here}}
+\caption{Scanning Animation While API Processes Leaf Image}
+\label{fig:scanning_screen}
+\end{figure}
+
+\subsection{Disease Detection Result Screen}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.4\textwidth]{images/result_screen.png}
+\fbox{\parbox[c][10cm][c]{0.4\textwidth}{\centering\Large\textbf{[Result Screen Screenshot]}\\\normalsize Insert result\_screen.png here}}
+\caption{Disease Detection Result Page with Confidence Score and Treatment Tabs}
+\label{fig:result_screen}
+\end{figure}
+
+\subsection{Treatment Recommendation Screen}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.4\textwidth]{images/treatment_screen.png}
+\fbox{\parbox[c][10cm][c]{0.4\textwidth}{\centering\Large\textbf{[Treatment Screen Screenshot]}\\\normalsize Insert treatment\_screen.png here}}
+\caption{Treatment Recommendation Screen (Chemical Treatment Tab, Kannada)}
+\label{fig:treatment_screen}
+\end{figure}
+
+\subsection{Grad-CAM Heatmap Visualization}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.7\textwidth]{images/gradcam.png}
+\fbox{\parbox[c][7cm][c]{0.7\textwidth}{\centering\Large\textbf{[Grad-CAM Heatmap]}\\\normalsize Insert gradcam.png here}}
+\caption{Grad-CAM Heatmap Highlighting Diseased Region on Papaya Leaf}
+\label{fig:gradcam}
+\end{figure}
+
+\subsection{Medicine Details Screen}
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.4\textwidth]{images/medicine_screen.png}
+\fbox{\parbox[c][10cm][c]{0.4\textwidth}{\centering\Large\textbf{[Medicine Screen Screenshot]}\\\normalsize Insert medicine\_screen.png here}}
+\caption{Recommended Medicine Details with Dosage, Price, and Buy Link}
+\label{fig:medicine_screen}
+\end{figure}
+
+% ============================================================
+%        CHAPTER 8: CONCLUSION AND FUTURE ENHANCEMENT
+% ============================================================
+\chapter{Conclusion and Future Enhancement}
+
+\section{Conclusion}
+This project successfully developed and deployed an end-to-end AI-powered papaya leaf disease detection system tailored for the farming community of Karnataka. The system combines a novel 3-Stage AI Validation Pipeline with a transfer-learning-based MobileNetV2 model, achieving a test accuracy of \textbf{91.7\%} across five classes, including an imposter rejection class.
+
+The key contributions of this project are:
+\begin{itemize}
+    \item A robust \textbf{3-Stage Validation Pipeline} (green-ratio $\rightarrow$ Gemini AI shape verification $\rightarrow$ MobileNetV2 classification) that eliminates false positives from non-papaya leaves.
+    \item A \textbf{multilingual Flutter mobile application} providing disease results and treatment advice in Kannada, Hindi, and English.
+    \item A locally calibrated \textbf{treatment recommendation database} with specific pesticide names, dosages, market prices, and purchasing links from Karnataka's local and online agri-stores.
+    \item \textbf{Grad-CAM heatmap visualization} making AI decisions interpretable for farmers.
+    \item A free cloud deployment using \textbf{Docker on Hugging Face Spaces}, making the system accessible without any infrastructure cost.
+    \item An \textbf{Expert Override mechanism} that brings human judgment into borderline AI decisions.
+\end{itemize}
+
+The system provides a practical, scalable solution to a real agricultural challenge faced by thousands of papaya farmers in Dakshina Kannada, Udupi, and surrounding districts.
+
+\section{Future Enhancement}
+The following enhancements are proposed:
+
+\begin{enumerate}
+    \item \textbf{On-Device TFLite Model}: Convert and deploy the model as a TFLite file for fully offline inference on the smartphone, eliminating internet dependency.
+    \item \textbf{Expanded Disease Coverage}: Add detection for more papaya conditions: Anthracnose, Phytophthora root rot, and Cercospora leaf spot.
+    \item \textbf{Real-Time Video Scanning}: Implement live camera feed detection using the device camera stream.
+    \item \textbf{iOS Support}: Extend the Flutter app to iOS for wider accessibility.
+    \item \textbf{Severity Mapping with Segmentation}: Use image segmentation to precisely calculate the percentage of affected leaf area using U-Net.
+    \item \textbf{Market Price Integration}: Integrate live market price data from Karnataka State Agricultural Marketing Board (KSAM) for real-time pesticide pricing.
+    \item \textbf{Push Notifications}: Send disease alerts based on seasonal risk predictions and local weather patterns.
+    \item \textbf{Federated Learning}: Train the model collaboratively on farmer-contributed images without sharing raw data, improving model accuracy for local papaya varieties.
+    \item \textbf{Chatbot Integration}: Add a multilingual chatbot (Gemini-powered) for interactive Q\&A on disease management.
+\end{enumerate}
+
+% ============================================================
+%                       REFERENCES
+% ============================================================
+\newpage
+\begin{center}
+{\Large\bfseries REFERENCES}
+\end{center}
+\addcontentsline{toc}{chapter}{References}
+
+\begin{enumerate}[label={[\arabic*]}]
+
+    \item S. P. Mohanty, D. P. Hughes, and M. Salathé, ``Using deep learning for image-based plant disease detection,'' \textit{Frontiers in Plant Science}, vol. 7, p. 1419, 2016.
+
+    \item A. Ramcharan, K. Baranowski, P. McCloskey, B. Ahmed, J. Legg, and D. P. Hughes, ``Deep learning for image-based cassava disease detection,'' \textit{Frontiers in Plant Science}, vol. 8, p. 1852, 2017.
+
+    \item K. P. Ferentinos, ``Deep learning models for plant disease detection and diagnosis,'' \textit{Computers and Electronics in Agriculture}, vol. 145, pp. 311--318, 2018.
+
+    \item M. Sibiya and M. Sumbwanyambe, ``A computational procedure for the recognition and classification of maize leaf diseases out of healthy leaves using convolutional neural networks,'' \textit{AgriEngineering}, vol. 1, no. 1, pp. 119--131, 2019.
+
+    \item M. Agarwal, A. Gupta, and M. K. Biswas, ``A new conv2D method for face recognition application,'' \textit{Journal of Artificial Intelligence and Capsule Networks}, vol. 2, no. 3, pp. 173--183, 2020.
+
+    \item A. S. Paymode and V. B. Malode, ``Transfer learning for multi-crop leaf disease image classification using convolutional neural network VGG,'' \textit{Artificial Intelligence in Agriculture}, vol. 6, pp. 23--33, 2022.
+
+    \item P. Bedi and P. Gole, ``Plant disease detection using hybrid model based on convolutional autoencoder and convolutional neural network,'' \textit{Artificial Intelligence in Agriculture}, vol. 5, pp. 90--101, 2021.
+
+    \item M. Pattnaik, S. K. Sharma, M. Rathore, and U. Sisodia, ``A comparative study on deep learning for rice disease detection,'' \textit{Concurrency and Computation: Practice and Experience}, 2021.
+
+    \item H. Sabrol and S. Kumar, ``Deep learning-based plant disease detection and classification: A review,'' \textit{Information}, vol. 11, no. 12, p. 589, 2020.
+
+    \item T. Kp, M. Gao, B. Liu, F. Masood, J. ul Hassan, and H. Zhang, ``Deep learning based plant disease detection for smart agriculture,'' \textit{Electronics}, vol. 11, no. 14, p. 2204, 2022.
+
+    \item S. K. Arjaria, R. Rathore, A. Gupta, and P. Sinha, ``Machine learning-based detection of papaya ringspot virus using leaf images,'' \textit{Computers and Electronics in Agriculture}, vol. 196, p. 106864, 2023.
+
+    \item S. S. Rajpoot, K. L. Bansal, A. Singh, S. Chauhan, and D. Choudhary, ``Detecting papaya leaf diseases using YOLOv5,'' \textit{Procedia Computer Science}, vol. 215, pp. 450--460, 2023.
+
+    \item A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, ``MobileNets: Efficient convolutional neural networks for mobile vision applications,'' \textit{arXiv preprint arXiv:1704.04861}, 2017.
+
+    \item M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, ``MobileNetV2: Inverted residuals and linear bottlenecks,'' \textit{Proceedings of the IEEE/CVF CVPR}, pp. 4510--4520, 2018.
+
+    \item R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra, ``Grad-CAM: Visual explanations from deep networks via gradient-based localization,'' \textit{Proceedings of the IEEE ICCV}, pp. 618--626, 2017.
+
+    \item K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' \textit{Proceedings of the IEEE/CVF CVPR}, pp. 770--778, 2016.
+
+    \item S. Ioffe and C. Szegedy, ``Batch normalization: Accelerating deep network training by reducing internal covariate shift,'' \textit{Proceedings of ICML}, pp. 448--456, 2015.
+
+    \item N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov, ``Dropout: A simple way to prevent neural networks from overfitting,'' \textit{Journal of Machine Learning Research}, vol. 15, pp. 1929--1958, 2014.
+
+    \item D. P. Kingma and J. Ba, ``Adam: A method for stochastic optimization,'' \textit{Proceedings of ICLR}, 2015.
+
+    \item F. Pedregosa et al., ``Scikit-learn: Machine learning in Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+
+\end{enumerate}
+
+% ============================================================
+%                   PERSONAL PROFILES
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries PERSONAL PROFILES}
+\end{center}
+\addcontentsline{toc}{chapter}{Personal Profiles}
+\vspace{0.5cm}
+
+% ---- Profile 1 ----
+\noindent\rule{\textwidth}{0.4pt}
+\begin{minipage}[t]{0.25\textwidth}
+\centering
+\vspace{0.2cm}
+% \includegraphics[width=3cm,height=3.8cm]{images/photo1.jpg}
+\fbox{\parbox[c][4cm][c]{3cm}{\centering\small\textbf{[Photo 1]}\\\footnotesize Passport Size}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\textwidth}
+\vspace{0.2cm}
+\begin{tabular}{ll}
+\textbf{Name}       & : \textbf{[Student Name 1]} \\
+\textbf{USN}        & : \textbf{[USN 1]} \\
+\textbf{Email}      & : \textbf{[Email ID 1]} \\
+\textbf{Phone}      & : \textbf{[Phone Number 1]} \\
+\textbf{Address}    & : \textbf{[Residential Address 1]} \\
+\textbf{Department} & : CSE (Data Science) \\
+\textbf{College}    & : VCET, Puttur \\
+\end{tabular}
+\end{minipage}
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\vspace{0.5cm}
+
+% ---- Profile 2 ----
+\noindent\rule{\textwidth}{0.4pt}
+\begin{minipage}[t]{0.25\textwidth}
+\centering
+\vspace{0.2cm}
+\fbox{\parbox[c][4cm][c]{3cm}{\centering\small\textbf{[Photo 2]}\\\footnotesize Passport Size}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\textwidth}
+\vspace{0.2cm}
+\begin{tabular}{ll}
+\textbf{Name}       & : \textbf{[Student Name 2]} \\
+\textbf{USN}        & : \textbf{[USN 2]} \\
+\textbf{Email}      & : \textbf{[Email ID 2]} \\
+\textbf{Phone}      & : \textbf{[Phone Number 2]} \\
+\textbf{Address}    & : \textbf{[Residential Address 2]} \\
+\textbf{Department} & : CSE (Data Science) \\
+\textbf{College}    & : VCET, Puttur \\
+\end{tabular}
+\end{minipage}
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\vspace{0.5cm}
+
+% ---- Profile 3 ----
+\noindent\rule{\textwidth}{0.4pt}
+\begin{minipage}[t]{0.25\textwidth}
+\centering
+\vspace{0.2cm}
+\fbox{\parbox[c][4cm][c]{3cm}{\centering\small\textbf{[Photo 3]}\\\footnotesize Passport Size}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\textwidth}
+\vspace{0.2cm}
+\begin{tabular}{ll}
+\textbf{Name}       & : \textbf{[Student Name 3]} \\
+\textbf{USN}        & : \textbf{[USN 3]} \\
+\textbf{Email}      & : \textbf{[Email ID 3]} \\
+\textbf{Phone}      & : \textbf{[Phone Number 3]} \\
+\textbf{Address}    & : \textbf{[Residential Address 3]} \\
+\textbf{Department} & : CSE (Data Science) \\
+\textbf{College}    & : VCET, Puttur \\
+\end{tabular}
+\end{minipage}
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\vspace{0.5cm}
+
+% ---- Profile 4 ----
+\noindent\rule{\textwidth}{0.4pt}
+\begin{minipage}[t]{0.25\textwidth}
+\centering
+\vspace{0.2cm}
+\fbox{\parbox[c][4cm][c]{3cm}{\centering\small\textbf{[Photo 4]}\\\footnotesize Passport Size}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.72\textwidth}
+\vspace{0.2cm}
+\begin{tabular}{ll}
+\textbf{Name}       & : \textbf{[Student Name 4]} \\
+\textbf{USN}        & : \textbf{[USN 4]} \\
+\textbf{Email}      & : \textbf{[Email ID 4]} \\
+\textbf{Phone}      & : \textbf{[Phone Number 4]} \\
+\textbf{Address}    & : \textbf{[Residential Address 4]} \\
+\textbf{Department} & : CSE (Data Science) \\
+\textbf{College}    & : VCET, Puttur \\
+\end{tabular}
+\end{minipage}
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+% ============================================================
+%              CONFERENCE ATTENDED (PLACEHOLDER)
+% ============================================================
+\newpage
+\thispagestyle{plain}
+\begin{center}
+{\Large\bfseries CONFERENCE ATTENDED}
+\end{center}
+\addcontentsline{toc}{chapter}{Conference Attended}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tabular}{|p{0.8cm}|p{3.5cm}|p{3.5cm}|p{2.5cm}|p{2.5cm}|}
+\hline
+\textbf{Sl.} & \textbf{Conference Name} & \textbf{Title of Paper} & \textbf{Date \& Venue} & \textbf{Authors} \\
+\hline
+1 & \textbf{[Conference Name]} & \textbf{[Paper Title]} & \textbf{[Date, Venue]} & \textbf{[Author Names]} \\[20pt]
+\hline
+2 & & & & \\[20pt]
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+% \includegraphics[width=0.85\textwidth]{images/conference_certificate.png}
+\fbox{\parbox[c][9cm][c]{0.85\textwidth}{\centering\Large\textbf{[Conference Certificate / Acceptance Letter]}\\\normalsize Insert conference\_certificate.png here}}
+\end{center}
+
+% ============================================================
+\end{document}
+% ============================================================

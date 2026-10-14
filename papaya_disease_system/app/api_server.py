@@ -1,5 +1,10 @@
 import os
 import sys
+
+# Set environment variables to prevent OpenBLAS crashes on Windows
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+
 import json
 import math
 import random
@@ -34,7 +39,6 @@ try:
     from PIL import Image
     import io
     import numpy as np
-    import rembg
     from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
     HAS_TF = True
     
@@ -47,6 +51,12 @@ try:
             tf.config.experimental.set_memory_growth(gpu, True)
         model = tf.keras.models.load_model(MODEL_PATH)
         print(f"Loaded papaya model successfully from {MODEL_PATH}")
+        try:
+            dummy_papaya = np.zeros((1, 224, 224, 3), dtype=np.float32)
+            model.predict(dummy_papaya, verbose=0)
+            print("Papaya model warmed up.")
+        except Exception as e:
+            print(f"Papaya model warmup skipped: {e}")
     else:
         print(f"Model path not found: {MODEL_PATH}")
 
@@ -88,7 +98,9 @@ def _call_gemini_vision(image_bytes: bytes, prompt: str, max_tokens: int = 10) -
         import base64
 
         # Use the key from environment, or default to a placeholder
-        api_key = os.getenv("GEMINI_API_KEY", "YOUR_OPENROUTER_KEY_HERE")
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        if not api_key or api_key.startswith("YOUR_"):
+            return ""
         base64_image = base64.b64encode(image_bytes).decode('utf-8')
 
         # Detect if it's OpenRouter (sk-or- or AQ. format) or direct Gemini

@@ -1,81 +1,129 @@
-# 🍃 Papaya Disease Detection System
+# 🌿 Papaya Disease Detection System
 
-An AI-powered system to detect diseases in papaya leaves using a unique 3-stage validation pipeline. The project consists of a **FastAPI Backend** and a **Flutter Mobile App**.
-
-## 🚀 Key Features
-- **3-Stage AI Verification:** 
-    1. **Stage 1 (Color):** Heuristic green-ratio check to ensure the image contains a plant.
-    2. **Stage 2 (Shape):** AI-powered shape verification (specifically looking for the 7-lobe palmate pattern).
-    3. **Stage 3 (Disease):** TensorFlow model classification (Healthy, Leaf Curl, Powdery Mildew, Ringspot).
-- **Expert Override:** Manual confirmation dialog if the AI is unsure (40%-60% confidence).
-- **Stricter Rejection:** Automatically rejects "imposter" leaves (Mango, Banana, etc.) using ImageNet diagnostics.
-- **Multi-lingual Support:** Kannada, Hindi, and English.
+A complete end-to-end precision agriculture solution integrating Deep Learning, Explainable AI (Grad-CAM), a FastAPI backend, a Streamlit dashboard, and a cross-platform Flutter mobile application to diagnose papaya leaf diseases in real-time.
 
 ---
 
-## 🛠️ Setup Instructions
+## 📌 Overview
 
-### 1. Backend (FastAPI)
-**Prerequisites:** Python 3.10+ installed.
+Papaya (*Carica papaya*) is a vital fruit crop prone to devastating foliar diseases that significantly reduce agricultural yield. This project provides farmers and agricultural researchers with an accessible, automated diagnostic system using computer vision.
 
-```powershell
-# Navigate to backend folder
+### Key Capabilities
+- **Multi-Class Disease Classification:** Detects and distinguishes between:
+  - **Papaya Ringspot Virus (PRSV)**
+  - **Powdery Mildew**
+  - **Leaf Curl Disease**
+  - **Healthy Leaves**
+  - **Background / Non-Leaf Rejection**
+- **Explainable AI (XAI):** Incorporates Grad-CAM (Gradient-weighted Class Activation Mapping) to visually highlight infected leaf regions.
+- **Intelligent Preprocessing:** Leaf validation and background segmentation (via Rembg) to filter non-target images before inference.
+- **Actionable Advisory:** Tailored organic and chemical treatment recommendations with weather-aware advisories.
+- **Cross-Platform Mobile App:** Flutter client featuring live camera scanning, multi-language/TTS audio guidance, and history tracking.
+
+---
+
+## 🏗️ Project Architecture
+
+```
+Papaya-Disease-Detection/
+├── papaya_disease_system/         # Python Deep Learning Backend & Services
+│   ├── app/
+│   │   ├── api_server.py          # FastAPI REST API server
+│   │   └── streamlit_app.py       # Streamlit interactive web dashboard
+│   ├── models/
+│   │   ├── papaya_model.keras     # Trained MobileNetV2 Keras model
+│   │   └── papaya_model.tflite    # Quantized TensorFlow Lite edge model
+│   ├── src/                       # Training, preprocessing & XAI pipeline
+│   │   ├── gradcam.py             # Grad-CAM heatmap generator
+│   │   ├── preprocess.py          # Image augmentation and preprocessing
+│   │   ├── recommend.py           # Disease treatment recommendations
+│   │   ├── train.py               # Model training pipeline
+│   │   └── weather.py             # Weather API integration
+│   ├── data/                      # Dataset (raw & sample images)
+│   └── requirements.txt           # Python dependencies
+│
+├── papaya_flutter_app/            # Flutter Mobile Application
+│   ├── lib/
+│   │   ├── models/                # App data models
+│   │   ├── screens/               # UI screens (Home, Camera, Results, History)
+│   │   ├── services/              # API & audio TTS services
+│   │   └── main.dart              # Application entry point
+│   ├── pubspec.yaml               # Flutter package configuration
+│   └── assets/                    # Static assets & icons
+│
+├── project_report/                # Academic Project Report
+│   ├── main.tex                   # Complete LaTeX source
+│   └── images/                    # Report figures & diagrams
+│
+└── Papaya_Disease_Detection_Conference_Paper.docx # Conference Paper Draft
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Backend Server Setup (FastAPI & Streamlit)
+
+Ensure you have Python 3.10+ installed.
+
+```bash
+# Navigate to the backend directory
 cd papaya_disease_system
 
-# Create and activate virtual environment
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+# Create and activate a virtual environment
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the server
-python app/api_server.py
+# Run FastAPI API server
+uvicorn app.api_server:app --host 0.0.0.0 --port 8000 --reload
+
+# Alternatively, run the Streamlit Web Dashboard:
+streamlit run app.streamlit_app.py
 ```
-*The server will run at `http://0.0.0.0:8001`*
 
-### 2. Mobile App (Flutter)
-**Prerequisites:** Flutter SDK and Android Studio installed.
+### 2. Flutter Mobile Application
 
-```powershell
-# Navigate to flutter folder
+Ensure you have Flutter SDK installed (`flutter doctor`).
+
+```bash
+# Navigate to the Flutter project
 cd papaya_flutter_app
 
-# Fetch dependencies
+# Fetch packages
 flutter pub get
 
-# Connect your phone via USB and run
+# Run on a connected Android/iOS device or emulator
 flutter run
 ```
 
 ---
 
-## ☁️ Deployment Instructions (Hugging Face - FREE)
+## ☁️ Cloud Deployment (Hugging Face Spaces - Free)
 
-I have included a `Dockerfile` to make hosting the backend easy and free on Hugging Face Spaces.
+A `Dockerfile` is included for zero-config hosting of the FastAPI inference backend:
 
-1. Create a new **Space** on [Hugging Face](https://huggingface.co/new-space).
-2. Select **Docker** as the SDK.
-3. Choose the **Blank** template.
-4. Go to the "Settings" tab of your Space and connect your **GitHub Repository**.
-5. The backend will automatically build and provide you with a public URL (e.g., `https://username-space.hf.space`).
-
-**Note:** Once deployed, update the `baseUrl` in `lib/services/api_backend_service.dart` to your new public URL.
+1. Create a new Space on [Hugging Face Spaces](https://huggingface.co/new-space).
+2. Choose **Docker** as the SDK and select **Blank**.
+3. Under Space settings, link your GitHub repository.
+4. Once deployed, update `baseUrl` in [`papaya_flutter_app/lib/services/api_backend_service.dart`](papaya_flutter_app/lib/services/api_backend_service.dart) to point to your live URL.
 
 ---
 
-## 👨‍💻 Development & Retraining
+## 📊 Dataset & Model Details
 
-To improve the model's ability to reject non-papaya leaves:
-1. Add images of other leaves to `papaya_disease_system/data/raw/background`.
-2. Run the training script:
-   ```powershell
-   python papaya_disease_system/src/train.py
-   ```
+- **Base Architecture:** Transfer learning using MobileNetV2 with custom dense classification layers.
+- **Edge Deployment:** Exported to quantized TensorFlow Lite (`.tflite`) for efficient on-device or edge deployment.
+- **Validation:** Pre-inference check verifying leaf presence before executing model inference.
 
 ---
 
-## 📄 Repository Structure
-- `/papaya_disease_system`: Python FastAPI backend, ML models, and training scripts.
-- `/papaya_flutter_app`: Flutter mobile application source code.
-- `Dockerfile`: Configuration for cloud hosting.
+## 📄 Documentation & Research
+
+- Complete technical documentation and methodology can be found in [`project_report/main.tex`](project_report/main.tex).
+- Research findings and experimental results are summarized in `Papaya_Disease_Detection_Conference_Paper.docx`.
